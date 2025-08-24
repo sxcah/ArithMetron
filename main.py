@@ -208,7 +208,7 @@ class Laser(AnimatedSprite):
             dx /= magnitude
             dy /= magnitude
         
-        self.speed = 15
+        self.speed = 50
         self.speed_x = dx * self.speed
         self.speed_y = dy * self.speed
         

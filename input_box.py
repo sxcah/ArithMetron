@@ -26,7 +26,8 @@ class InputBox:
                 self.txt_surface = self.font.render(self.text, True, self.text_color)
                 return submitted_text
             else:
-                self.text += event.unicode
+                if event.unicode.isdigit():
+                    self.text += event.unicode
             self.txt_surface = self.font.render(self.text, True, self.text_color)
             self.cursor_timer = 0
         return None
