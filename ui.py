@@ -18,6 +18,7 @@ class UI():
         self.stage_size = (150, 50)
         self.number_size = (25, 25)
         self.lives_sprite_size = (120, 48)
+        self.dash_size = (25, 25)
         
         self.scale_images()
     
@@ -38,6 +39,11 @@ class UI():
             self.stage_text = pygame.transform.scale(self.original_stage_text, self.stage_size)
         else:
             self.stage_text = None
+
+        if self.original_dash_sprite:
+            self.dash_sprite = pygame.transform.scale(self.original_dash_sprite, self.dash_size)
+        else:
+            self.dash_sprite = None
     
     def draw_stage_info(self, stage_number):
         stage_str = str(stage_number)
@@ -54,9 +60,12 @@ class UI():
             self.display_surface.blit(self.stage_text, (pos_x, pos_y))
             pos_x += self.stage_size[0] + 10
         
+        if self.dash_size:
+            self.display_surface.blit(self.dash_sprite, (pos_x - 35, pos_y + 10))
+
         for digit in stage_str:
             if digit in self.number_sprites and self.number_sprites[digit]:
-                self.display_surface.blit(self.number_sprites[digit], (pos_x - 30, pos_y + 10))
+                self.display_surface.blit(self.number_sprites[digit], (pos_x, pos_y + 10))
                 pos_x += self.number_size[0] + 5
     
     def draw_lives(self,):

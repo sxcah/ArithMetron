@@ -3,6 +3,7 @@
 import pygame, sys, random, os, math
 from settings import *
 from animated_sprite import AnimatedSprite
+from stage_cleared import StageCleared
 
 pygame.mixer.init()
 
@@ -443,6 +444,7 @@ class Game:
         self.explosions = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.ui = UI()
+        self.staged_cleared = None
 
     def create_menu_buttons(self, button_data):
         for i, (item, image_data, action) in enumerate(button_data):
@@ -592,6 +594,7 @@ class Game:
             else:
                 # Stage cleared but more stages remain
                 self.game_state = "level_cleared"
+                self.create_stage_completion()
                 pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
 
     def proceed_to_next_stage(self):
@@ -649,6 +652,14 @@ class Game:
         self.spaceship_group.add(self.spaceship)
         
         play_menu_music()
+
+    def create_stage_completion(self):
+        self.staged_cleared = StageCleared(
+            self.game_background,
+            self.stars,
+            self.all_sprites,
+            self.score
+        )
 
     def run(self):
         while True:
@@ -808,46 +819,8 @@ class Game:
                 self.screen.blit(restart_text, restart_rect)
 
             elif self.game_state == "level_cleared":
-                # Draw the game background with victory screen
-                self.screen.blit(self.game_background, (0, 0))
-                
-                # Draw stars
-                self.stars = [((x - 1) % SCREEN_WIDTH, (y + 1) % SCREEN_HEIGHT) for (x, y) in self.stars]
-                for (x, y) in self.stars:
-                    self.screen.fill((200, 200, 220), (x, y, 2, 2))
-
-                # Continue updating and drawing sprites for visual effect
-                self.all_sprites.update(dt)
-                self.all_sprites.draw(self.screen)
-
-                # Victory overlay
-                victory_overlay = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-                victory_overlay.fill((0, 50, 0, 180))  # Semi-transparent green
-                self.screen.blit(victory_overlay, (0, 0))
-                
-                # Victory text
-                victory_text = self.font_big.render("VICTORY!", True, (255, 255, 100))
-                victory_rect = victory_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60))
-                self.screen.blit(victory_text, victory_rect)
-                
-                # All stages cleared text
-                cleared_text = self.font_med.render("Stage Cleared", True, (200, 255, 200))
-                cleared_rect = cleared_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
-                self.screen.blit(cleared_text, cleared_rect)
-                
-                # Final score
-                final_score_text = self.font_med.render(f"Current Score: {self.score}", True, (255, 255, 255))
-                final_score_rect = final_score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
-                self.screen.blit(final_score_text, final_score_rect)
-                
-                # Instructions
-                next_stage_text = self.font_small.render("Press Enter to Continue to next Stage", True, (230, 230, 240))
-                next_stage_rect = next_stage_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
-                self.screen.blit(next_stage_text, next_stage_rect)
-
-                return_text = self.font_small.render("Press R to return to menu", True, (230, 230, 240))
-                return_text_rect = return_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80))
-                self.screen.blit(return_text, return_text_rect)
+                self.staged_cleared.display()
+                self.staged_cleared.update(dt)
 
             pygame.display.flip()
             self.clock.tick(FPS)
