@@ -1,4 +1,4 @@
-import pygame as py, os
+import pygame as py, os, random
 
 def load_image(path, colorkey=None):
     try:
@@ -58,3 +58,11 @@ def display_text(display, font, text, color, center=None):
     surface_blit(text_surf, text_rect)
 
     return text_rect
+
+def draw_stars(display, stars, height):
+
+    new_stars = [(x, (y + 3) % height) for (x, y) in stars]
+
+    for (x, y) in new_stars:
+        py.draw.rect(display, (200, 200, 220), (x, y, 2, 2))
+    return new_stars

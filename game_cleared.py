@@ -3,8 +3,8 @@ import pygame as py
 from support import surface_blit, load_font, overlay, display_text
 from settings import FONT, FONT_SIZE
 
-class StageCleared():
-    def __init__(self,  background, stars, all_sprites, score):
+class GameCleared():
+    def __init__(self, background, stars, all_sprites, score):
         self.display_surface = py.display.get_surface()
 
         self.stars = stars
@@ -42,7 +42,7 @@ class StageCleared():
         
         display_text(self.display_surface,
                      self.font['med'],
-                     f"Current Score: {self.score}",
+                     f"Your Score: {self.score}",
                      (255, 255, 255),
                      (self.display_surface.get_width() // 2,
                       self.display_surface.get_height() // 2)                    
@@ -50,10 +50,10 @@ class StageCleared():
 
         display_text(self.display_surface,
                      self.font['med'],
-                     "Press \"Enter\" to Next Stage!",
+                     "GAME CLEARED!",
                      (255, 255, 255),
                      (self.display_surface.get_width() // 2,
-                      self.display_surface.get_height() // 2 + 80)                    
+                      self.display_surface.get_height() // 2 + 40)                    
                      )
 
         display_text(self.display_surface,
