@@ -15,9 +15,12 @@ DARK_BLUE = (10, 10, 25)
 TEXT_COLOR = (230, 235, 245)
 SHIP_COLOR = (100, 180, 255)
 ENEMY_COLOR = (255, 120, 120)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+WHITE = (255, 255, 255)
 
-menu_bgm = None
-game_bgm = None
+menu_bgm = r'assets/sfx/music/bgm.mp3'
+game_bgm = r'assets/sfx/music/game_bgm.mp3'
 
 LIVES = 3
 
@@ -78,4 +81,8 @@ DIFFICULTY_STAGES = [
     {"spawn_interval": 1000,"enemy_speed": 3, "enemies_to_clear": 3}
 ]
 
-pop_up_background = 'assets/ui_ux/settings/tab.png'
+settings_background = 'assets/ui_ux/settings/tab.png'
+settings_settings_text = 'assets/ui_ux/settings/text/settings.png'
+settings_music_text = 'assets/ui_ux/settings/text/music.png'
+settings_bar_sprite = 'assets/ui_ux/settings/bar.png'
+settings_knob_sprite = 'assets/ui_ux/settings/bar_knob.png'

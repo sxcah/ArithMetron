@@ -11,42 +11,6 @@ pygame.mixer.init()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
-'''menu_bgm = r"bgm.mp3"
-game_bgm = r"game_bgm.mp3"'''
-
-menu_bgm = None
-game_bgm = None
-
-def play_menu_music():
-    try:
-        pygame.mixer.music.load(menu_bgm)
-        pygame.mixer.music.play(loops=-1)
-        pygame.mixer.music.set_volume(0.3)
-    except pygame.error as e:
-        print(f"Warning: Could not load menu music: {e}")
-
-def play_game_music():
-    """Plays the game BGM."""
-    try:
-        pygame.mixer.music.load(game_bgm)
-        pygame.mixer.music.play(loops=-1)
-        pygame.mixer.music.set_volume(0.3)
-    except pygame.error as e:
-        print(f"Warning: Could not load game music: {e}")
-
-def stop_music():
-    pygame.mixer.music.stop()
-
-
-player_filenames = ["player1.png", "player2.png"]
-enemy_filenames = ["enemy1.png", "enemy2.png"]
-explosion_filenames = ["explosion.png"]
-laser_filenames = ["lazer.png"]
-levels_filename = "levels.png"
-settings_filename = "settings.png"
-my_stats_filename = "my_stats.png"
-quit_filename = "quit.png"
-
 def load_frames(filenames, default_color, is_player=True):
     frames = []
     script_dir = "" 
@@ -328,8 +292,6 @@ class Game:
         self.is_animation_finished = False
         self.stars = [(random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)) for _ in range(120)]
 
-        play_menu_music()
-
         self.font_big = pygame.font.Font(None, 48)
         self.font_med = pygame.font.Font(None, 24)
         self.font_small = pygame.font.Font(None, 18)
@@ -432,6 +394,8 @@ class Game:
         self.staged_cleared = None
         self.game_cleared = None
 
+        self.settings_popup.play_menu_music()
+
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
@@ -473,7 +437,7 @@ class Game:
         self.current_stage = DIFFICULTY_STAGES[self.current_stage_index]
         pygame.time.set_timer(SPAWN_EVENT, self.current_stage["spawn_interval"])
         
-        play_game_music()
+        self.settings_popup.play_menu_music()
 
     def update_menu_animation(self, dt):
         self.title_rect.y += self.menu_animation_speed
@@ -486,7 +450,7 @@ class Game:
         self.spaceship.rect.y += self.spaceship_launch_speed
 
         if self.spaceship.rect.bottom <= 0:
-            stop_music()
+            self.settings_popup.stop_music()
             self.reset_game()
 
     def start_play_animation(self):
@@ -522,7 +486,10 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit_game()
-            
+
+            if self.settings_popup.is_active:
+                self.settings_popup.handle_event(event)
+
             # Handle pause toggle in play state (before other game state checks)
             if self.game_state == "play" and not self.game_over:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
@@ -530,18 +497,26 @@ class Game:
                     return submitted_text
             
             if self.game_state == "menu":
-                for button in self.buttons:
-                    if isinstance(button, Button):
-                        button.handle_event(event)
-                    else:
-                        if event.type == pygame.MOUSEBUTTONDOWN and button.rect.collidepoint(event.pos):
-                            if hasattr(button, 'action'):
-                                button.action()
-                self.levels_window.handle_event(event)
+                if not (self.settings_popup.is_active or self.stats_popup.is_active):
+                    for button in self.buttons:
+                        if isinstance(button, Button):
+                            button.handle_event(event)
+                        else:
+                            if event.type == pygame.MOUSEBUTTONDOWN and button.rect.collidepoint(event.pos):
+                                if hasattr(button, 'action'):
+                                    button.action()
+                    self.levels_window.handle_event(event)
+
                 if event.type == pygame.MOUSEBUTTONDOWN and (self.settings_popup.is_active or self.stats_popup.is_active):
                     if not self.settings_popup.rect.collidepoint(event.pos) and not self.stats_popup.rect.collidepoint(event.pos):
                         self.settings_popup.is_active = False
                         self.stats_popup.is_active = False
+
+                if self.settings_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
+                        if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
+                            self.settings_popup.toggle_music()
+                        if hasattr(self.settings_popup, 'sfx_toggle_rect') and self.settings_popup.sfx_toggle_rect.collidepoint(event.pos):
+                            self.settings_popup.sfx_enabled = not self.settings_popup.sfx_enabled
 
             elif self.game_state == "play" and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
@@ -638,7 +613,7 @@ class Game:
         self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
         self.spaceship_group.add(self.spaceship)
         
-        play_menu_music()
+        self.settings_popup.play_menu_music()
 
     def create_stage_completion(self):
         self.staged_cleared = StageCleared(
