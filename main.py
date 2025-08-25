@@ -3,6 +3,7 @@ from settings import *
 from animated_sprite import AnimatedSprite
 from stage_cleared import StageCleared
 from game_cleared import GameCleared
+from pop_up import SettingsPopup
 from support import draw_stars
 
 pygame.mixer.init()
@@ -256,26 +257,6 @@ class Spaceship(AnimatedSprite):
     def update(self, dt):
         super().update(dt)
 
-class SettingsPopup:
-    def __init__(self):
-        self.is_active = False
-        self.rect = pygame.Rect(
-            SCREEN_WIDTH // 4,
-            SCREEN_HEIGHT // 4,
-            SCREEN_WIDTH // 2,
-            SCREEN_HEIGHT // 2
-        )
-        self.surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        self.surface.fill(TRANSLUCENT_BLACK)
-    
-    def draw(self, screen):
-        if self.is_active:
-            screen.blit(self.surface, self.rect.topleft)
-            font = pygame.font.Font(None, 48)
-            text = font.render("Settings (Empty)", True, WHITE)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            screen.blit(text, text_rect)
-
 class MyStatsPopup:
     def __init__(self):
         self.is_active = False
@@ -468,10 +449,6 @@ class Game:
                 button.rect = button.image.get_rect(center=(SCREEN_WIDTH // 2, y_position))
                 self.buttons.add(button)
                 button.action = action
-
-    def _handle_simple_button(self, event, action, rect):
-        if event.type == pygame.MOUSEBUTTONDOWN and rect.collidepoint(event.pos):
-            action()
     
     def reset_game(self):
         self.game_state = "play"
@@ -699,7 +676,7 @@ class Game:
 
                 self.levels_window.update()
                 self.levels_window.draw(self.screen)
-                self.settings_popup.draw(self.screen)
+                self.settings_popup.display()
                 self.stats_popup.draw(self.screen)
             
             elif self.game_state == "play_animation":

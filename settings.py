@@ -77,3 +77,5 @@ DIFFICULTY_STAGES = [
     # Stage 1
     {"spawn_interval": 1000,"enemy_speed": 3, "enemies_to_clear": 3}
 ]
+
+pop_up_background = 'assets/ui_ux/settings/tab.png'
