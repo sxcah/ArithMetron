@@ -83,6 +83,10 @@ DIFFICULTY_STAGES = [
 
 settings_background = 'assets/ui_ux/settings/tab.png'
 settings_settings_text = 'assets/ui_ux/settings/text/settings.png'
-settings_music_text = 'assets/ui_ux/settings/text/music.png'
+
+
 settings_bar_sprite = 'assets/ui_ux/settings/bar.png'
 settings_knob_sprite = 'assets/ui_ux/settings/bar_knob.png'
+
+settings_music_text = 'assets/ui_ux/settings/text/music.png'
+settings_sounds_text = 'assets/ui_ux/settings/text/sound.png'

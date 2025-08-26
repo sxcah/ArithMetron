@@ -10,6 +10,7 @@ class SettingsPopup():
         self.background_sprite = load_image(settings_background)
         self.settings_sprite = load_image(settings_settings_text)
         self.music_sprite = load_image(settings_music_text)
+        self.sound_sprite = load_image(settings_sounds_text)
         self.bar_sprite = load_image(settings_bar_sprite)
         self.bar_knob_sprite = load_image(settings_knob_sprite)
 
@@ -35,6 +36,10 @@ class SettingsPopup():
         # Current music state
         self.current_music = None  
         self.music_position = 0    
+
+        # Current sound state
+        self.current_sound = None
+        self.sound_position = 0
         
         # Slider interaction
         self.dragging_music = False
@@ -57,11 +62,11 @@ class SettingsPopup():
     def play_game_music(self):
         if self.music_enabled and game_bgm:
             try:
-                if self.current_music != "game":
+                if self.current_music != "play":
                     py.mixer.music.load(game_bgm)
                     py.mixer.music.play(loops=-1)
-                    self.current_music = "game"
-                py.mixer.music.set_volume(self.music_volume)
+                    self.current_music = "play"
+                py.mixer.music.set_volume(self.sfx_volume)
             except py.error as e:
                 print(f"Warning: Could not load game music: {e}")
 
@@ -91,7 +96,7 @@ class SettingsPopup():
         # Music slider bounds
         bar_size = (325, 50)
         bar_pos_x = self.display_surface.get_width() // 2
-        bar_pos_y = self.display_surface.get_height() // 2 - 100
+        bar_pos_y = self.display_surface.get_height() // 2 - 80
         music_slider_rect = py.Rect(
             bar_pos_x - bar_size[0] // 2,
             bar_pos_y - bar_size[1] // 2,
@@ -99,7 +104,8 @@ class SettingsPopup():
             bar_size[1]
         )
         
-        sfx_bar_pos_y = bar_pos_y + 80
+        sfx_bar_pos_y = self.display_surface.get_height() // 2 + 70
+
         sfx_slider_rect = py.Rect(
             bar_pos_x - bar_size[0] // 2,
             sfx_bar_pos_y - bar_size[1] // 2,
@@ -111,11 +117,13 @@ class SettingsPopup():
             if event.button == 1:
                 if music_slider_rect.collidepoint(event.pos):
                     self.dragging_music = True
+                    print(self.dragging_music, "Dragging Music")
                     relative_x = event.pos[0] - music_slider_rect.left
                     new_volume = relative_x / bar_size[0]
                     self.set_music_volume(new_volume)
                 elif sfx_slider_rect.collidepoint(event.pos):
                     self.dragging_sfx = True
+                    print(self.dragging_sfx, "Dragging Sounds")
                     relative_x = event.pos[0] - sfx_slider_rect.left
                     new_volume = relative_x / bar_size[0]
                     self.set_sfx_volume(new_volume)
@@ -138,7 +146,7 @@ class SettingsPopup():
     def background(self):
         if self.is_active:
             file_name = self.background_sprite
-            width = (self.display_surface.get_width() // 2)
+            width = (self.display_surface.get_width() // 2 + 75)
             height = (self.display_surface.get_height() // 2 + 200)
             size = (width, height)
             x = self.display_surface.get_width() // 2
@@ -148,7 +156,6 @@ class SettingsPopup():
 
     def draw_music_controls(self):
         if self.is_active:
-            # Music label
             file_name = self.music_sprite
             width = (225)
             height = (50)
@@ -158,7 +165,6 @@ class SettingsPopup():
             position = (x, y)
             self.draw_ui_sprite(file_name, size, position, anchor_point='center')
             
-            # Music slider
             self.draw_slider(
                 y_offset=-80,
                 volume=self.music_volume,
@@ -167,20 +173,19 @@ class SettingsPopup():
 
     def draw_sfx_controls(self):
         if self.is_active:
-            # SFX label (create text since we might not have sprite)
-            font = self.font['med']
-            sfx_text = font.render("Sound Effects", True, WHITE)
-            sfx_rect = sfx_text.get_rect(center=(
-                self.display_surface.get_width() // 2,
-                self.display_surface.get_height() // 2
-            ))
-            self.display_surface.blit(sfx_text, sfx_rect)
+            file_name = self.sound_sprite
+            width = (225)
+            height = (50)
+            size = (width, height)
+            x = self.display_surface.get_width() // 2
+            y = self.display_surface.get_height() // 2
+            position = (x, y)
+            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
             
-            # SFX slider
             self.draw_slider(
-                y_offset= 50,
+                y_offset= 70,
                 volume=self.sfx_volume,
-                label="SFX"
+                label="Sound"
             )
 
     def draw_slider(self, y_offset, volume, label):
@@ -214,7 +219,7 @@ class SettingsPopup():
             font = self.font['med']
             volume_text = font.render(f"{int(volume * 100)}%", True, WHITE)
             volume_rect = volume_text.get_rect(center=(
-                bar_pos_x + bar_size[0] // 2 + 60,
+                bar_pos_x + bar_size[0] // 2 + 20,
                 bar_pos_y
             ))
             self.display_surface.blit(volume_text, volume_rect)
@@ -226,8 +231,8 @@ class SettingsPopup():
             music_color = GREEN if self.music_enabled else RED
             music_text = font.render("Music: ON" if self.music_enabled else "Music: OFF", True, music_color)
             music_rect = music_text.get_rect(center=(
-                self.display_surface.get_width() // 2 - 150,
-                self.display_surface.get_height() // 2 + 100
+                self.display_surface.get_width() // 2 - 100,
+                self.display_surface.get_height() // 2 + 150
             ))
             self.display_surface.blit(music_text, music_rect)
             
@@ -236,8 +241,8 @@ class SettingsPopup():
             sfx_color = GREEN if self.sfx_enabled else RED
             sfx_text = font.render("SFX: ON" if self.sfx_enabled else "SFX: OFF", True, sfx_color)
             sfx_rect = sfx_text.get_rect(center=(
-                self.display_surface.get_width() // 2 + 150,
-                self.display_surface.get_height() // 2 + 100
+                self.display_surface.get_width() // 2 + 100,
+                self.display_surface.get_height() // 2 + 150
             ))
             self.display_surface.blit(sfx_text, sfx_rect)
             
@@ -254,6 +259,6 @@ class SettingsPopup():
     def display(self):
         if self.is_active:
             self.background()
-            self.draw_music_controls()
             self.draw_sfx_controls()
+            self.draw_music_controls()
             self.draw_toggle_buttons()

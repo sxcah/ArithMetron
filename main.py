@@ -526,6 +526,9 @@ class Game:
                     self.enemies.add(e)
                     self.all_sprites.add(e)
                     self.enemies_spawned_in_stage += 1
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.return_to_menu()
             
             elif self.game_state == "game_cleared":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
@@ -653,6 +656,8 @@ class Game:
                 self.levels_window.draw(self.screen)
                 self.settings_popup.display()
                 self.stats_popup.draw(self.screen)
+
+                self.settings_popup.current_music = self.game_state
             
             elif self.game_state == "play_animation":
                 self.screen.blit(self.menu_background, (0, 0))
@@ -668,6 +673,7 @@ class Game:
                     self.reset_game()
             
             elif self.game_state == "play":
+                self.settings_popup.play_game_music()
                 if not self.game_over and not self.paused:
                     self.all_sprites.update(dt)
                     self.input_box.update(dt)
@@ -756,6 +762,8 @@ class Game:
             elif self.game_state == "level_cleared":
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
+
+            print(self.settings_popup.current_music)
 
             pygame.display.flip()
             self.clock.tick(FPS)
