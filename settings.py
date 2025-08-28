@@ -80,7 +80,7 @@ FONT_SIZE = {
 # Stages
 DIFFICULTY_STAGES = [
     # Stage 1
-    {"spawn_interval": 500,"enemy_speed": 4, "enemies_to_clear": 3},
+    {"spawn_interval": 500,"enemy_speed": 200, "enemies_to_clear": 3},
     # Stage 2
     {"spawn_interval": 3000,"enemy_speed": 2, "enemies_to_clear": 4},
     # Stage 3   
@@ -125,3 +125,5 @@ settings_knob_sprite = 'assets/ui_ux/settings/bar_knob.png'
 
 settings_music_text = 'assets/ui_ux/settings/text/music.png'
 settings_sounds_text = 'assets/ui_ux/settings/text/sound.png'
+
+menu_background = 'assets/background/main_background.png'

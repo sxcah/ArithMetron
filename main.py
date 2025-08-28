@@ -3,6 +3,8 @@ from settings import *
 from animated_sprite import AnimatedSprite
 from stage_cleared import StageCleared
 from game_cleared import GameCleared
+from game_over import GameOver
+from background import AnimatedBackground
 from pop_up import *
 from support import draw_stars
 from stats import MyStatsPopup
@@ -292,19 +294,23 @@ class Game:
         self.font_med = pygame.font.Font(None, 24)
         self.font_small = pygame.font.Font(None, 18)
 
+        self.game_background_anim = AnimatedBackground('assets/background/in_game/', num_frames=26, animation_speed=150)
+        self.menu_background_anim = AnimatedBackground('assets/background/main/', num_frames=1, animation_speed=150)
+
+        # DO NOT REMOVE
+
         self.menu_background = pygame.Surface(SCREEN_SIZE)
         self.menu_background.fill(DARK_PURPLE)
 
-        self.x = 0
-        self.y = 0
-
         for _ in range(200):
-            self.x = random.randint(0, SCREEN_WIDTH)
-            self.y = random.randint(0, SCREEN_HEIGHT)
-            pygame.draw.rect(self.menu_background, WHITE, (self.x, self.y, 2, 2))
+            x = random.randint(0, SCREEN_WIDTH)
+            y = random.randint(0, SCREEN_HEIGHT)
+            pygame.draw.rect(self.menu_background, WHITE, (x, y, 2, 2))
         
         self.game_background = pygame.Surface(SCREEN_SIZE)
         self.game_background.fill(DARK_BLUE)
+
+        # DO NOT REMOVE
 
         self.player_frames = load_frames(player_filenames, SHIP_COLOR, is_player=True)
         self.enemy_frames = load_frames(enemy_filenames, ENEMY_COLOR, is_player=False)
@@ -316,15 +322,7 @@ class Game:
         self.settings_button_size = (320, 40)
         self.my_stats_button_size = (320, 40)
         self.quit_button_size = (140, 40)
-
-        button_path = "assets/ui_ux/play_button"
-
-        play_button_states = load_button_images(button_path, scale=self.play_button_size)
-        levels_img   = load_static_button(levels_filename,   scale=self.levels_button_size)
-        settings_img = load_static_button(settings_filename, scale=self.settings_button_size)
-        my_stats_img = load_static_button(my_stats_filename, scale=self.my_stats_button_size)
-        quit_img     = load_static_button(quit_filename,     scale=self.quit_button_size)
-
+        
         self.spaceship_initial_y = SCREEN_HEIGHT * 0.25 
         self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
         self.spaceship_group = pygame.sprite.GroupSingle(self.spaceship)
@@ -332,27 +330,7 @@ class Game:
         self.buttons = pygame.sprite.Group()
         self.menu_buttons_y_start = self.spaceship_initial_y + 150 
         self.button_spacing = 105
-        
-        button_data = [
-                    ("Play", 
-                    play_button_states, 
-                    self.start_play_animation),
 
-                    ("Settings",
-                    settings_img,
-                    self.toggle_settings),
-
-                    ("My Stats",
-                    my_stats_img,
-                    self.toggle_stats),
-
-                    ("Quit",
-                    quit_img,
-                    self.quit_game)
-                ]
-        
-        self.create_menu_buttons(button_data)
-        
         self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
         self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
 
@@ -371,7 +349,7 @@ class Game:
 
         self.levels_window = LevelsSlideWindow()
         self.settings_popup = SettingsPopup()
-                # Load sound effects once and hand them to SettingsPopup
+        # Load sound effects once and hand them to SettingsPopup
         self.sounds = {
             'laser'    : pygame.mixer.Sound(laser_sfx),
             'explosion': pygame.mixer.Sound(explosion_sfx),
@@ -381,7 +359,7 @@ class Game:
             'hover'    : pygame.mixer.Sound(hover_sfx),
         }
         # Explosion is louder than score
-        self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)  # 1.8 × louder
+        self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)
         self.sounds['score'].set_volume(self.settings_popup.sfx_volume)
         self.settings_popup.sounds = self.sounds
         self.stats_popup = MyStatsPopup()
@@ -400,7 +378,10 @@ class Game:
         self.ui = UI()
         self.staged_cleared = None
         self.game_cleared = None
-
+        
+        # Call the new function to create the UI
+        self.create_menu_ui()
+        
         self.settings_popup.play_menu_music()
         self.last_hovered_button = None
 
@@ -593,34 +574,17 @@ class Game:
             self.game_state = "play"  # Return to play state
             self.input_box.active = True  # Reactivate input
 
-    def return_to_menu(self):
-        """Better method to return to menu from any state"""
-        self.game_state = "menu"
-        self.game_over = False
-        self.paused = False
-        self.victory = False
-        self.buttons.empty()
-        
-        # Reset button sizes and recreate them
-        self.play_button_size = (180, 140)
-        self.levels_button_size = (160, 60)
-        self.settings_button_size = (180, 60)
-        self.my_stats_button_size = (180, 60)
-        self.quit_button_size = (150, 50)
-        
-        play_button_states = load_button_images("play", scale=self.play_button_size)
-        '''levels_img   = load_static_button(levels_filename,   scale=self.levels_button_size)'''
+    def create_menu_ui(self):
+        self.buttons.empty()  # Clear existing buttons
+        self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
+        self.spaceship_group.add(self.spaceship)
+
+        button_path = "assets/ui_ux/play_button"
+        play_button_states = load_button_images(button_path, scale=self.play_button_size)
+        levels_img   = load_static_button(levels_filename, scale=self.levels_button_size)
         settings_img = load_static_button(settings_filename, scale=self.settings_button_size)
         my_stats_img = load_static_button(my_stats_filename, scale=self.my_stats_button_size)
-        quit_img     = load_static_button(quit_filename,     scale=self.quit_button_size)
-
-        self.spaceship_initial_y = SCREEN_HEIGHT * 0.25
-        self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
-        self.spaceship_group = pygame.sprite.GroupSingle(self.spaceship)
-
-        self.buttons = pygame.sprite.Group()
-        self.menu_buttons_y_start = self.spaceship_initial_y + 150
-        self.button_spacing = 100 
+        quit_img     = load_static_button(quit_filename, scale=self.quit_button_size)
 
         button_data = [
             ("Play", play_button_states, self.start_play_animation),
@@ -628,12 +592,23 @@ class Game:
             ("My Stats", my_stats_img, self.toggle_stats),
             ("Quit", quit_img, self.quit_game)
         ]
-        
         self.create_menu_buttons(button_data)
+
+
+    def return_to_menu(self):
+        self.game_state = "menu"
+        self.game_over = False
+        self.paused = False
+        self.victory = False
         
-        self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
-        self.spaceship_group.add(self.spaceship)
-        
+        # Use the same button sizes as __init__
+        self.play_button_size = (180, 120)
+        self.levels_button_size = (180, 40)
+        self.settings_button_size = (320, 40)
+        self.my_stats_button_size = (320, 40)
+        self.quit_button_size = (140, 40)
+
+        self.create_menu_ui()
         self.settings_popup.play_menu_music()
 
     def create_stage_completion(self):
@@ -652,22 +627,35 @@ class Game:
             self.score
         )
     
+    def create_game_over(self):
+        self.game_over_screen = GameOver(
+            self.game_background,
+            self.stars,
+            self.all_sprites,
+            self.score
+        )
+
     def run(self):
         while True:
             dt = self.clock.tick(FPS)
             submitted_text = self.handle_events()
 
-            if self.game_state == "menu":
-                self.screen.blit(self.menu_background, (0, 0))
-                
+            # Update the backgrounds based on the game state
+            if self.game_state == "menu" or self.game_state == "play_animation":
+                self.menu_background_anim.update(dt)
+                self.screen.blit(self.menu_background_anim.get_current_frame(), (0, 0))
                 self.screen.blit(self.title_surf, self.title_rect)
-                self.spaceship_group.update(dt) 
+                self.spaceship_group.update(dt)
                 self.spaceship_group.draw(self.screen)
-                
+            else: # "play", "game_cleared", "level_cleared"
+                self.game_background_anim.update(dt)
+                self.screen.blit(self.game_background_anim.get_current_frame(), (0, 0))
+                self.stars = draw_stars(self.screen, self.stars, SCREEN_HEIGHT)
+
+            if self.game_state == "menu":
                 for button in self.buttons:
                     if isinstance(button, Button):
-                         button.update()
-                
+                        button.update()
                 self.buttons.draw(self.screen)
 
                 self.levels_window.update()
@@ -678,10 +666,6 @@ class Game:
                 self.settings_popup.current_music = self.game_state
             
             elif self.game_state == "play_animation":
-                self.screen.blit(self.menu_background, (0, 0))
-                
-                self.screen.blit(self.title_surf, self.title_rect)
-
                 self.update_menu_animation(dt) 
                 
                 self.buttons.draw(self.screen)
@@ -718,32 +702,28 @@ class Game:
 
                     # Handle Hits for hitting enemy
                     hits = pygame.sprite.groupcollide(self.lasers, self.enemies, True, True)
-                    for laser, enemies_hit in hits.items():
-                        for enemy in enemies_hit:
-                            explosion = Explosion(self.explosion_frames, enemy.rect.center)
-                            self.explosions.add(explosion)
-                            self.all_sprites.add(explosion)
-                            
-                            self.score += 10
-                            self.enemies_cleared_in_stage += 1
-                            self.stats_popup.update({
-                              "highest_level": self.current_stage_index + 1,
-                               "annihilated": 1
-                             })
-                            self.sounds['explosion'].play()
-                            self.sounds['score'].play()
-                            self.check_stage_completion()
+                    
+                    all_enemies_hit = [enemy for enemies_list in hits.values() for enemy in enemies_list]
+                    unique_enemies = set(all_enemies_hit)
 
-                for button in self.buttons:
-                 if isinstance(button, Button) and button.rect.collidepoint(mouse_pos):
-                     hovered = button
-                     break
-                 if hovered and hovered is not self.last_hovered_button:
-                  self.settings_popup.sounds['hover'].play()  # <-- Add this line
-                  self.last_hovered_button = hovered
+                    for enemy in unique_enemies:
+                        explosion = Explosion(self.explosion_frames, enemy.rect.center)
+                        self.explosions.add(explosion)
+                        self.all_sprites.add(explosion)
+                        
+                        self.score += 10
+                        self.enemies_cleared_in_stage += 1
+                        self.stats_popup.update({
+                            "highest_level": self.current_stage_index + 1,
+                            "annihilated": 1
+                        })
+                        self.sounds['explosion'].play()
+                        self.sounds['score'].play()
+                    
+                    self.check_stage_completion()
 
                     # Handles Losing Life
-                for e in list(self.enemies):
+                    for e in list(self.enemies):
                         if e.rect.bottom >= SCREEN_HEIGHT - 60:
                             self.enemies.remove(e)
                             self.all_sprites.remove(e)
@@ -753,11 +733,9 @@ class Game:
                             self.enemies_spawned_in_stage -= 1
                             if self.lives <= 0:
                                 self.game_over = True
+                                self.create_game_over()
                                 self.input_box.active = False
                                 self.sounds['gameover'].play()
-                
-                self.screen.blit(self.game_background, (0, 0))
-                self.stars = draw_stars(self.screen, self.stars, SCREEN_HEIGHT)
                 
                 pygame.draw.line(self.screen, (60, 80, 120), (0, SCREEN_HEIGHT - 60), (SCREEN_WIDTH, SCREEN_HEIGHT - 60), 2)
                 self.all_sprites.draw(self.screen)
@@ -770,7 +748,7 @@ class Game:
 
                 if self.paused:
                     pause_overlay = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-                    pause_overlay.fill((0, 0, 0, 128))  # Semi-transparent black
+                    pause_overlay.fill((0, 0, 0, 128))
                     self.screen.blit(pause_overlay, (0, 0))
                     
                     pause_text = self.font_big.render("PAUSED", True, WHITE)
@@ -780,15 +758,11 @@ class Game:
                     resume_text = self.font_med.render("Press P to Resume", True, TEXT_COLOR)
                     resume_rect = resume_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
                     self.screen.blit(resume_text, resume_rect)
+                elif self.game_over:
+                    self.game_over_screen.display()
+                    self.game_over_screen.update(dt)
 
-                if self.game_over:
-                    over = self.font_big.render("GAME OVER", True, (255, 180, 180))
-                    hint = self.font_small.render("Press R to Restart", True, (230, 230, 240))
-                    self.screen.blit(over, over.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 10)))
-                    self.screen.blit(hint, hint.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 26)))
-
-            elif self.game_state == "game_cleared":          
-                self.stars = draw_stars(self.screen, self.stars, SCREEN_HEIGHT)
+            elif self.game_state == "game_cleared":
                 self.game_cleared.display()
                 self.game_cleared.update(dt)
 
@@ -796,15 +770,15 @@ class Game:
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
 
-                # ---- hover sound ----
+            # ---- global hover sound logic ----
             mouse_pos = pygame.mouse.get_pos()
             hovered = None
             for button in self.buttons:
-                    if isinstance(button, Button) and button.rect.collidepoint(mouse_pos):
-                        hovered = button
-                        break
+                if isinstance(button, Button) and button.rect.collidepoint(mouse_pos):
+                    hovered = button
+                    break
             if hovered and hovered is not self.last_hovered_button:
-                    self.settings_popup.sounds['hover'].play()
+                self.settings_popup.sounds['hover'].play()
             self.last_hovered_button = hovered
 
             pygame.display.flip()
