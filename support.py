@@ -66,9 +66,18 @@ def draw_stars(display, stars, height):
     for (x, y) in new_stars:
         py.draw.rect(display, (200, 200, 220), (x, y, 2, 2))
     return new_stars
+
 def get_master_sfx_volume() -> float:
     """
     Returns the current SFX volume (0.0 – 1.0) as set in SettingsPopup.
     """
     import __main__   # simple way to reach the running Game instance
     return __main__.game.settings_popup.sfx_volume
+
+def draw_ui_sprite(surface, size, position, anchor_point):
+    if surface:
+        scaled = py.transform.scale(surface, size)
+        rect = scaled.get_rect(**{anchor_point: position})
+        surface_blit(scaled, rect)
+        return True
+    return False

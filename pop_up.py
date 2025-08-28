@@ -1,8 +1,8 @@
 import pygame as py
 
-from support import surface_blit, load_image, load_font
+from support import surface_blit, load_image, load_font, draw_ui_sprite
 from settings import *
-from Stats import *
+from stats import *
 
 class SettingsPopup():
      def _init_sounds(self):
@@ -61,6 +61,7 @@ class SettingsPopup():
 
         self.sounds = {}
         self._init_sounds()
+        
      def play_menu_music(self):
         if self.music_enabled and menu_bgm:
             try:
@@ -170,7 +171,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2
             position = (x, y)
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
+            draw_ui_sprite(file_name, size, position, anchor_point='center')
 
      def draw_music_controls(self):
         if self.is_active:
@@ -181,7 +182,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2 - 150
             position = (x, y)
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
+            draw_ui_sprite(file_name, size, position, anchor_point='center')
             
             self.draw_slider(
                 y_offset=-80,
@@ -198,7 +199,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2
             position = (x, y)
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
+            draw_ui_sprite(file_name, size, position, anchor_point='center')
             
             self.draw_slider(
                 y_offset= 70,
@@ -213,7 +214,7 @@ class SettingsPopup():
             bar_pos_y = self.display_surface.get_height() // 2 + y_offset
             bar_position = (bar_pos_x, bar_pos_y)
 
-            self.draw_ui_sprite(
+            draw_ui_sprite(
                 self.bar_sprite,
                 bar_size,
                 bar_position,
@@ -227,7 +228,7 @@ class SettingsPopup():
             knob_pos_y = bar_pos_y
             knob_position = (knob_pos_x, knob_pos_y)
 
-            self.draw_ui_sprite(
+            draw_ui_sprite(
                 self.bar_knob_sprite,
                 knob_size,
                 knob_position,
@@ -265,14 +266,6 @@ class SettingsPopup():
             self.display_surface.blit(sfx_text, sfx_rect)
             
             self.sfx_toggle_rect = sfx_rect
-
-     def draw_ui_sprite(self, surface, size, position, anchor_point):
-        if surface:
-            scaled = py.transform.scale(surface, size)
-            rect = scaled.get_rect(**{anchor_point: position})
-            surface_blit(scaled, rect)
-            return True
-        return False
 
      def display(self):
         if self.is_active:

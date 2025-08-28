@@ -5,7 +5,7 @@ from stage_cleared import StageCleared
 from game_cleared import GameCleared
 from pop_up import *
 from support import draw_stars
-from Stats import StatsDisplay
+from stats import MyStatsPopup
 
 pygame.mixer.init()
 
@@ -377,7 +377,7 @@ class Game:
         self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)  # 1.8 × louder
         self.sounds['score'].set_volume(self.settings_popup.sfx_volume)
         self.settings_popup.sounds = self.sounds
-        self.stats_popup = StatsDisplay(self.screen)
+        self.stats_popup = MyStatsPopup()
         self.input_box = InputBox(
             x=(SCREEN_WIDTH - 200) // 2,
             y=SCREEN_HEIGHT - 50,
@@ -474,8 +474,9 @@ class Game:
             self.stats_popup.is_active = False
 
     def toggle_stats(self):
-         self.stats_popup.is_active = not self.stats_popup.is_active
-         print("toggle_stats called -> is_active =", self.stats_popup.is_active)
+        self.stats_popup.is_active = not self.stats_popup.is_active
+        if self.stats_popup.is_active:
+            self.settings_popup.is_active = False
         
     def quit_game(self):
         pygame.quit()
@@ -497,7 +498,29 @@ class Game:
                     return submitted_text
             
             if self.game_state == "menu":
-                if not (self.settings_popup.is_active or self.stats_popup.is_active):
+                # Handle popup-specific clicks first
+                if self.settings_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
+                    if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
+                        self.settings_popup.toggle_music()
+                    elif hasattr(self.settings_popup, 'sfx_toggle_rect') and self.settings_popup.sfx_toggle_rect.collidepoint(event.pos):
+                        self.settings_popup.sfx_enabled = not self.settings_popup.sfx_enabled
+                    # If click was inside settings popup, don't close it
+                    elif self.settings_popup.rect.collidepoint(event.pos):
+                        pass  # Click was inside popup, do nothing
+                    else:
+                        # Click was outside popup, close it
+                        self.settings_popup.is_active = False
+
+                elif self.stats_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
+                    # If click was inside stats popup, don't close it
+                    if self.stats_popup.rect.collidepoint(event.pos):
+                        pass  # Click was inside popup, do nothing
+                    else:
+                        # Click was outside popup, close it
+                        self.stats_popup.is_active = False
+
+                # Handle button clicks only if no popups are active
+                elif not (self.settings_popup.is_active or self.stats_popup.is_active):
                     for button in self.buttons:
                         if isinstance(button, Button):
                             button.handle_event(event)
@@ -506,17 +529,6 @@ class Game:
                                 if hasattr(button, 'action'):
                                     button.action()
                     self.levels_window.handle_event(event)
-
-                if event.type == pygame.MOUSEBUTTONDOWN and (self.settings_popup.is_active or self.stats_popup.is_active):
-                    if not self.settings_popup.rect.collidepoint(event.pos) and not self.stats_popup.rect.collidepoint(event.pos):
-                        self.settings_popup.is_active = False
-                        self.stats_popup.is_active = False
-
-                if self.settings_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
-                        if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
-                            self.settings_popup.toggle_music()
-                        if hasattr(self.settings_popup, 'sfx_toggle_rect') and self.settings_popup.sfx_toggle_rect.collidepoint(event.pos):
-                            self.settings_popup.sfx_enabled = not self.settings_popup.sfx_enabled
 
             elif self.game_state == "play" and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
@@ -538,7 +550,7 @@ class Game:
                 self.return_to_menu()
 
             elif self.game_state == "level_cleared":
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Changed from K_SPACE to K_RETURN
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     self.proceed_to_next_stage()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.return_to_menu()
@@ -782,7 +794,6 @@ class Game:
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
 
-            print(self.settings_popup.current_music)
                 # ---- hover sound ----
             mouse_pos = pygame.mouse.get_pos()
             hovered = None
@@ -793,6 +804,7 @@ class Game:
             if hovered and hovered is not self.last_hovered_button:
                     self.settings_popup.sounds['hover'].play()
             self.last_hovered_button = hovered
+
             pygame.display.flip()
             self.clock.tick(FPS)
 if __name__ == "__main__":
