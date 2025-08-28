@@ -3,14 +3,9 @@ from settings import *
 from animated_sprite import AnimatedSprite
 from stage_cleared import StageCleared
 from game_cleared import GameCleared
-<<<<<<< HEAD
-from pop_up import SettingsPopup
-from support import draw_stars
-=======
 from pop_up import *
 from support import draw_stars
 from stats import MyStatsPopup
->>>>>>> ralph
 
 pygame.mixer.init()
 
@@ -41,10 +36,7 @@ def load_frames(filenames, default_color, is_player=True):
                 pulsing_color = (255 - i*20, 120 + i*10, 120 + i*20)
                 pygame.draw.rect(surf, pulsing_color, (10, 10, 40, 40), border_radius=10)
             frames.append(surf)
-<<<<<<< HEAD
-=======
         
->>>>>>> ralph
 
     return frames
 
@@ -231,29 +223,6 @@ class Spaceship(AnimatedSprite):
     def update(self, dt):
         super().update(dt)
 
-<<<<<<< HEAD
-class MyStatsPopup:
-    def __init__(self):
-        self.is_active = False
-        self.rect = pygame.Rect(
-            SCREEN_WIDTH // 4,
-            SCREEN_HEIGHT // 4,
-            SCREEN_WIDTH // 2,
-            SCREEN_HEIGHT // 2
-        )
-        self.surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        self.surface.fill(TRANSLUCENT_BLACK)
-    
-    def draw(self, screen):
-        if self.is_active:
-            screen.blit(self.surface, self.rect.topleft)
-            font = pygame.font.Font(None, 48)
-            text = font.render("My Stats (Empty)", True, WHITE)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            screen.blit(text, text_rect)
-
-=======
->>>>>>> ralph
 class LevelsSlideWindow:
     def __init__(self):
         self.is_active = False
@@ -289,10 +258,6 @@ class LevelsSlideWindow:
     def handle_event(self, event):
         if self.is_active:
             for button in self.buttons:
-<<<<<<< HEAD
-                if event.type == pygame.MOUSEBUTTONDOWN and button.rect.collidepoint(event.pos):
-                    print(f"Level {button.rect.centery} clicked!")
-=======
               if isinstance(button, Button):
                   button.handle_event(event)
               else:
@@ -300,7 +265,6 @@ class LevelsSlideWindow:
                    if hasattr(button, 'action'):
                       print("button pressed:", button.action.__name__)
                       button.action()
->>>>>>> ralph
 
 from ui import UI
 from input_box import InputBox
@@ -400,8 +364,6 @@ class Game:
 
         self.levels_window = LevelsSlideWindow()
         self.settings_popup = SettingsPopup()
-<<<<<<< HEAD
-=======
                 # Load sound effects once and hand them to SettingsPopup
         self.sounds = {
             'laser'    : pygame.mixer.Sound(laser_sfx),
@@ -415,7 +377,6 @@ class Game:
         self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)  # 1.8 × louder
         self.sounds['score'].set_volume(self.settings_popup.sfx_volume)
         self.settings_popup.sounds = self.sounds
->>>>>>> ralph
         self.stats_popup = MyStatsPopup()
         self.input_box = InputBox(
             x=(SCREEN_WIDTH - 200) // 2,
@@ -434,10 +395,7 @@ class Game:
         self.game_cleared = None
 
         self.settings_popup.play_menu_music()
-<<<<<<< HEAD
-=======
         self.last_hovered_button = None
->>>>>>> ralph
 
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
@@ -519,11 +477,7 @@ class Game:
         self.stats_popup.is_active = not self.stats_popup.is_active
         if self.stats_popup.is_active:
             self.settings_popup.is_active = False
-<<<<<<< HEAD
-
-=======
         
->>>>>>> ralph
     def quit_game(self):
         pygame.quit()
         sys.exit()
@@ -544,9 +498,6 @@ class Game:
                     return submitted_text
             
             if self.game_state == "menu":
-<<<<<<< HEAD
-                if not (self.settings_popup.is_active or self.stats_popup.is_active):
-=======
                 # Handle popup-specific clicks first
                 if self.settings_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
                     if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
@@ -570,7 +521,6 @@ class Game:
 
                 # Handle button clicks only if no popups are active
                 elif not (self.settings_popup.is_active or self.stats_popup.is_active):
->>>>>>> ralph
                     for button in self.buttons:
                         if isinstance(button, Button):
                             button.handle_event(event)
@@ -580,20 +530,6 @@ class Game:
                                     button.action()
                     self.levels_window.handle_event(event)
 
-<<<<<<< HEAD
-                if event.type == pygame.MOUSEBUTTONDOWN and (self.settings_popup.is_active or self.stats_popup.is_active):
-                    if not self.settings_popup.rect.collidepoint(event.pos) and not self.stats_popup.rect.collidepoint(event.pos):
-                        self.settings_popup.is_active = False
-                        self.stats_popup.is_active = False
-
-                if self.settings_popup.is_active and event.type == pygame.MOUSEBUTTONDOWN:
-                        if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
-                            self.settings_popup.toggle_music()
-                        if hasattr(self.settings_popup, 'sfx_toggle_rect') and self.settings_popup.sfx_toggle_rect.collidepoint(event.pos):
-                            self.settings_popup.sfx_enabled = not self.settings_popup.sfx_enabled
-
-=======
->>>>>>> ralph
             elif self.game_state == "play" and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
                 # Enemy spawning only happens when not paused
@@ -614,11 +550,7 @@ class Game:
                 self.return_to_menu()
 
             elif self.game_state == "level_cleared":
-<<<<<<< HEAD
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Changed from K_SPACE to K_RETURN
-=======
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
->>>>>>> ralph
                     self.proceed_to_next_stage()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.return_to_menu()
@@ -639,14 +571,11 @@ class Game:
             else:
                 # Stage cleared but more stages remain
                 self.game_state = "level_cleared"
-<<<<<<< HEAD
-=======
                 self.sounds['newlevel'].play()
                 self.stats_popup.update({
                   "highest_level": self.current_stage_index + 1,
                    "annihilated": self.enemies_cleared_in_stage
                  })
->>>>>>> ralph
                 self.create_stage_completion()
                 pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
 
@@ -721,11 +650,7 @@ class Game:
             self.all_sprites,
             self.score
         )
-<<<<<<< HEAD
-
-=======
     
->>>>>>> ralph
     def run(self):
         while True:
             dt = self.clock.tick(FPS)
@@ -747,11 +672,7 @@ class Game:
                 self.levels_window.update()
                 self.levels_window.draw(self.screen)
                 self.settings_popup.display()
-<<<<<<< HEAD
-                self.stats_popup.draw(self.screen)
-=======
                 self.stats_popup.display()
->>>>>>> ralph
 
                 self.settings_popup.current_music = self.game_state
             
@@ -792,10 +713,7 @@ class Game:
                                 laser = Laser(self.laser_frames, self.player.rect.center, matched.rect.center)
                                 self.lasers.add(laser)
                                 self.all_sprites.add(laser)
-<<<<<<< HEAD
-=======
                                 self.sounds['laser'].play()
->>>>>>> ralph
 
                     # Handle Hits for hitting enemy
                     hits = pygame.sprite.groupcollide(self.lasers, self.enemies, True, True)
@@ -807,13 +725,6 @@ class Game:
                             
                             self.score += 10
                             self.enemies_cleared_in_stage += 1
-<<<<<<< HEAD
-
-                            self.check_stage_completion()
-
-                    # Handles Losing Life
-                    for e in list(self.enemies):
-=======
                             self.stats_popup.update({
                               "highest_level": self.current_stage_index + 1,
                                "annihilated": self.enemies_cleared_in_stage
@@ -831,7 +742,6 @@ class Game:
 
                     # Handles Losing Life
                 for e in list(self.enemies):
->>>>>>> ralph
                         if e.rect.bottom >= SCREEN_HEIGHT - 60:
                             self.enemies.remove(e)
                             self.all_sprites.remove(e)
@@ -842,10 +752,7 @@ class Game:
                             if self.lives <= 0:
                                 self.game_over = True
                                 self.input_box.active = False
-<<<<<<< HEAD
-=======
                                 self.sounds['gameover'].play()
->>>>>>> ralph
                 
                 self.screen.blit(self.game_background, (0, 0))
                 self.stars = draw_stars(self.screen, self.stars, SCREEN_HEIGHT)
@@ -887,9 +794,6 @@ class Game:
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
 
-<<<<<<< HEAD
-            print(self.settings_popup.current_music)
-=======
                 # ---- hover sound ----
             mouse_pos = pygame.mouse.get_pos()
             hovered = None
@@ -900,7 +804,6 @@ class Game:
             if hovered and hovered is not self.last_hovered_button:
                     self.settings_popup.sounds['hover'].play()
             self.last_hovered_button = hovered
->>>>>>> ralph
 
             pygame.display.flip()
             self.clock.tick(FPS)
