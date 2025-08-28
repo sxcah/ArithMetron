@@ -528,7 +528,6 @@ class Game:
 
             elif self.game_state == "play" and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
-                # Enemy spawning only happens when not paused
                 if event.type == SPAWN_EVENT and self.enemies_spawned_in_stage < self.current_stage["enemies_to_clear"]:
                     e = AnimatedEnemy(self.enemy_frames, self.font_med, self.score, self.current_stage["enemy_speed"])
                     self.enemies.add(e)
