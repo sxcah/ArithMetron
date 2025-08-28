@@ -96,13 +96,13 @@ def generate_problem(score):
     op = random.choice(ops)
     if op == "+":
         ans = a + b
-        q = f"{a}+{b}"
+        q = f"{a} + {b}"
     elif op == "-":
         ans = a - b
-        q = f"{a}-{b}"
+        q = f"{a} - {b}"
     else:
         ans = a * b
-        q = f"{a}×{b}"
+        q = f"{a} × {b}"
 
     return q, ans
 
@@ -166,7 +166,7 @@ class AnimatedEnemy(AnimatedSprite):
 class Laser(AnimatedSprite):
     def __init__(self, frames, start_pos, target_pos):
         super().__init__(frames, start_pos[0], start_pos[1])
-        self.animation_speed = 30
+        self.animation_speed = 10
         
         dx = target_pos[0] - start_pos[0]
         dy = target_pos[1] - start_pos[1]
@@ -198,8 +198,16 @@ class Laser(AnimatedSprite):
             self.kill()
 
 class Explosion(AnimatedSprite):
-    def __init__(self, frames, pos):
-        super().__init__(frames, pos[0], pos[1])
+    def __init__(self, frames, pos, scale=2):
+        # Scale the frames before passing them to the parent class
+        scaled_frames = []
+        if frames:
+            for frame in frames:
+                new_size = (int(frame.get_width() * scale), int(frame.get_height() * scale))
+                scaled_frame = pygame.transform.scale(frame, new_size)
+                scaled_frames.append(scaled_frame)
+
+        super().__init__(scaled_frames, pos[0], pos[1])
         self.animation_speed = 50
         self.one_time_animation_done = False
 
@@ -727,6 +735,7 @@ class Game:
                             self.sounds['explosion'].play()
                             self.sounds['score'].play()
                             self.check_stage_completion()
+
                 for button in self.buttons:
                  if isinstance(button, Button) and button.rect.collidepoint(mouse_pos):
                      hovered = button

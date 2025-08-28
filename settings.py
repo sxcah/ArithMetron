@@ -34,10 +34,32 @@ LIVES = 3
 
 player_folder_path = 'assets/entity/player/'
 enemy_folder_path = 'assets/entity/enemy/'
-player_filenames = [f"{player_folder_path}1.png", f"{player_folder_path}2.png"]
-enemy_filenames = [f"{enemy_folder_path}1.png", f"{enemy_folder_path}2.png"]
-explosion_filenames = ["explosion.png"]
-laser_filenames = ["lazer.png"]
+explosion_folder_path = 'assets/vfx/explosion/'
+laser_travelling_folder_path = 'assets/vfx/laser/travelling/'
+laser_firing_folder_path = 'assets/vfx/laser/firing/'
+
+player_filenames = [f"{player_folder_path}1.png",
+                    f"{player_folder_path}2.png"
+                    ]
+enemy_filenames = [f"{enemy_folder_path}1.png",
+                   f"{enemy_folder_path}2.png"
+                   ]
+
+explosion_filenames = [f"{explosion_folder_path}1.png",
+                       f"{explosion_folder_path}2.png",
+                       f"{explosion_folder_path}3.png",
+                       f"{explosion_folder_path}4.png",
+                       f"{explosion_folder_path}5.png",
+                       f"{explosion_folder_path}6.png",
+                       f"{explosion_folder_path}7.png",
+                       ]
+
+laser_filenames = [f"{laser_firing_folder_path}1.png",
+                   f"{laser_firing_folder_path}2.png",
+                   f"{laser_travelling_folder_path}1.png",
+                   f"{laser_travelling_folder_path}2.png",
+                   ]
+
 levels_filename = "levels.png"
 settings_filename = "settings.png"
 my_stats_filename = "my_stats.png"

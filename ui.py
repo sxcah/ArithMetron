@@ -79,18 +79,26 @@ class UI():
             self.display_surface.blit(self.lives_sprites[lives_key], (x, y))
     
     def draw_score(self, score):
-        score_str = str(score).zfill(3)
+        score_str = str(score)
+        total_width = len(score_str) * (self.number_size[0] + 2) - 2
         pos_x = self.display_surface.get_width() - 10
         pos_y = 10
         
-        for digit in score_str:
+        # Calculate the starting x position for the rightmost digit
+        start_x = pos_x
+        
+        for digit in score_str[::-1]: # Iterate over the string in reverse
             if digit in self.number_sprites and self.number_sprites[digit]:
                 sprite = self.number_sprites[digit]
                 sprite_rect = sprite.get_rect()
-                sprite_rect.topright = (pos_x, pos_y)
+                
+                # Position the current digit
+                sprite_rect.topright = (start_x, pos_y)
                 self.display_surface.blit(sprite, sprite_rect)
-                pos_x -= self.number_size[0] + 2
-    
+                
+                # Move the starting position to the left for the next digit
+                start_x -= self.number_size[0] + 2
+        
     def draw_dash(self, x, y):
         if self.dash_sprite:
             self.display_surface.blit(self.dash_sprite, (x, y))
