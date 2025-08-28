@@ -40,22 +40,23 @@ def load_frames(filenames, default_color, is_player=True):
 
     return frames
 
-def load_button_images(base_name, scale=None):
+def load_button_images(path_base, scale=None):
     states = {}
-    suffixes = {"default": "default", "pressed1": "pressed1", "pressed2": "pressed2"}
+    suffixes = {"idle": "idle", "hover": "hover", "pressed": "pressed"}
     for state, suffix in suffixes.items():
-        filename = f"{base_name}_{suffix}.png"
+        filename = f"{suffix}.png"
+        full_path = os.path.join(path_base, filename)
         try:
-            img = pygame.image.load(filename).convert_alpha()
+            img = pygame.image.load(full_path).convert_alpha()
             if scale:
                 img = pygame.transform.scale(img, scale)
             states[state] = img
         except Exception as e:
-            print(f"Warning: Could not load {filename}: {e}")
+            print(f"Warning: Could not load {full_path}: {e}")
             surf = pygame.Surface(scale, pygame.SRCALPHA)
             surf.fill((200, 50, 50))
             font = pygame.font.Font(None, 24)
-            text_surf = font.render(base_name.capitalize(), True, WHITE)
+            text_surf = font.render("Play", True, WHITE)
             text_rect = text_surf.get_rect(center=(surf.get_width() // 2, surf.get_height() // 2))
             surf.blit(text_surf, text_rect)
             states[state] = surf
@@ -110,7 +111,7 @@ class Button(pygame.sprite.Sprite):
     def __init__(self, states, position, action=None):
         super().__init__()
         self.states = states
-        self.current_state = "default"
+        self.current_state = "idle"
         self.image = self.states[self.current_state]
         self.rect = self.image.get_rect(center=position)
         self.action = action
@@ -124,22 +125,22 @@ class Button(pygame.sprite.Sprite):
 
     def start_transition(self):
         self.transitioning = True
-        self.current_state = "pressed1"
+        self.current_state = "pressed"
         self.image = self.states[self.current_state]
         self.state_change_time = pygame.time.get_ticks()
 
     def update(self):
         if self.transitioning:
             now = pygame.time.get_ticks()
-            if self.current_state == "pressed1" and now - self.state_change_time > 100: 
-                self.current_state = "pressed2"
+            if self.current_state == "pressed" and now - self.state_change_time > 100: 
+                self.current_state = "hover"
                 self.image = self.states[self.current_state]
                 self.state_change_time = now
-            elif self.current_state == "pressed2" and now - self.state_change_time > 100:
+            elif self.current_state == "hover" and now - self.state_change_time > 100:
                 if self.action:
                     self.action()
                 self.transitioning = False
-                self.current_state = "default"
+                self.current_state = "idle"
                 self.image = self.states[self.current_state]
 
 class AnimatedEnemy(AnimatedSprite):
@@ -316,7 +317,9 @@ class Game:
         self.my_stats_button_size = (320, 40)
         self.quit_button_size = (140, 40)
 
-        play_button_states = load_button_images("play", scale=self.play_button_size)
+        button_path = "assets/ui_ux/play_button"
+
+        play_button_states = load_button_images(button_path, scale=self.play_button_size)
         levels_img   = load_static_button(levels_filename,   scale=self.levels_button_size)
         settings_img = load_static_button(settings_filename, scale=self.settings_button_size)
         my_stats_img = load_static_button(my_stats_filename, scale=self.my_stats_button_size)
@@ -334,10 +337,6 @@ class Game:
                     ("Play", 
                     play_button_states, 
                     self.start_play_animation),
-
-                    ("Levels",
-                    levels_img,
-                    self.toggle_levels),
 
                     ("Settings",
                     settings_img,
@@ -610,7 +609,7 @@ class Game:
         self.quit_button_size = (150, 50)
         
         play_button_states = load_button_images("play", scale=self.play_button_size)
-        levels_img   = load_static_button(levels_filename,   scale=self.levels_button_size)
+        '''levels_img   = load_static_button(levels_filename,   scale=self.levels_button_size)'''
         settings_img = load_static_button(settings_filename, scale=self.settings_button_size)
         my_stats_img = load_static_button(my_stats_filename, scale=self.my_stats_button_size)
         quit_img     = load_static_button(quit_filename,     scale=self.quit_button_size)
@@ -625,7 +624,6 @@ class Game:
 
         button_data = [
             ("Play", play_button_states, self.start_play_animation),
-            ("Levels", levels_img, self.toggle_levels),
             ("Settings", settings_img, self.toggle_settings),
             ("My Stats", my_stats_img, self.toggle_stats),
             ("Quit", quit_img, self.quit_game)

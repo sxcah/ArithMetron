@@ -37,6 +37,9 @@ enemy_folder_path = 'assets/entity/enemy/'
 explosion_folder_path = 'assets/vfx/explosion/'
 laser_travelling_folder_path = 'assets/vfx/laser/travelling/'
 laser_firing_folder_path = 'assets/vfx/laser/firing/'
+settings_text_folder_path = 'assets/ui_ux/main_menu/'
+mystats_text_folder_path = 'assets/ui_ux/main_menu/'
+quit_text_folder_path = 'assets/ui_ux/main_menu/'
 
 player_filenames = [f"{player_folder_path}1.png",
                     f"{player_folder_path}2.png"
@@ -61,9 +64,9 @@ laser_filenames = [f"{laser_firing_folder_path}1.png",
                    ]
 
 levels_filename = "levels.png"
-settings_filename = "settings.png"
-my_stats_filename = "my_stats.png"
-quit_filename = "quit.png"
+settings_filename = f"{settings_text_folder_path}settings.png"
+my_stats_filename = f"{mystats_text_folder_path}my_stats.png"
+quit_filename = f"{quit_text_folder_path}exit.png"
 
 
 FONT = 'assets/fonts/minecraft.ttf'
