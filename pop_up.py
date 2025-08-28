@@ -1,11 +1,5 @@
 import pygame as py
 
-<<<<<<< HEAD
-from support import *
-from settings import *
-
-class SettingsPopup():
-=======
 from support import surface_blit, load_image, load_font, draw_ui_sprite
 from settings import *
 from stats import *
@@ -21,7 +15,6 @@ class SettingsPopup():
             'hover'    : py.mixer.Sound(hover_sfx),
         }
 
->>>>>>> ralph
     def __init__(self):
         self.display_surface = py.display.get_surface()
 
@@ -66,12 +59,9 @@ class SettingsPopup():
         if not py.mixer.get_init():
             py.mixer.init()
 
-<<<<<<< HEAD
-=======
         self.sounds = {}
         self._init_sounds()
     
->>>>>>> ralph
     def play_menu_music(self):
         if self.music_enabled and menu_bgm:
             try:
@@ -90,11 +80,7 @@ class SettingsPopup():
                     py.mixer.music.load(game_bgm)
                     py.mixer.music.play(loops=-1)
                     self.current_music = "play"
-<<<<<<< HEAD
-                py.mixer.music.set_volume(self.sfx_volume)
-=======
                 py.mixer.music.set_volume(self.music_volume)
->>>>>>> ralph
             except py.error as e:
                 print(f"Warning: Could not load game music: {e}")
 
@@ -109,14 +95,11 @@ class SettingsPopup():
 
     def set_sfx_volume(self, volume):
         self.sfx_volume = max(0.0, min(1.0, volume))
-<<<<<<< HEAD
-=======
         for key, snd in self.sounds.items():
             if key == 'explosion':
                 snd.set_volume(self.sfx_volume * 1.8)
             else:
                 snd.set_volume(self.sfx_volume)
->>>>>>> ralph
 
     def toggle_music(self):
         self.music_enabled = not self.music_enabled
@@ -125,8 +108,6 @@ class SettingsPopup():
         else:
             py.mixer.music.unpause()
 
-<<<<<<< HEAD
-=======
     def toggle_sfx(self):
         self.sfx_enabled = not self.sfx_enabled
         if not self.sfx_enabled:
@@ -135,7 +116,6 @@ class SettingsPopup():
         else:
             self.set_sfx_volume(self.sfx_volume)
 
->>>>>>> ralph
     def handle_event(self, event):
         if not self.is_active:
             return
@@ -199,11 +179,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2
             position = (x, y)
-<<<<<<< HEAD
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
-=======
             draw_ui_sprite(file_name, size, position, anchor_point='center')
->>>>>>> ralph
 
     def draw_music_controls(self):
         if self.is_active:
@@ -214,11 +190,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2 - 150
             position = (x, y)
-<<<<<<< HEAD
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
-=======
             draw_ui_sprite(file_name, size, position, anchor_point='center')
->>>>>>> ralph
             
             self.draw_slider(
                 y_offset=-80,
@@ -235,11 +207,7 @@ class SettingsPopup():
             x = self.display_surface.get_width() // 2
             y = self.display_surface.get_height() // 2
             position = (x, y)
-<<<<<<< HEAD
-            self.draw_ui_sprite(file_name, size, position, anchor_point='center')
-=======
             draw_ui_sprite(file_name, size, position, anchor_point='center')
->>>>>>> ralph
             
             self.draw_slider(
                 y_offset= 70,
@@ -254,11 +222,7 @@ class SettingsPopup():
             bar_pos_y = self.display_surface.get_height() // 2 + y_offset
             bar_position = (bar_pos_x, bar_pos_y)
 
-<<<<<<< HEAD
-            self.draw_ui_sprite(
-=======
             draw_ui_sprite(
->>>>>>> ralph
                 self.bar_sprite,
                 bar_size,
                 bar_position,
@@ -272,11 +236,7 @@ class SettingsPopup():
             knob_pos_y = bar_pos_y
             knob_position = (knob_pos_x, knob_pos_y)
 
-<<<<<<< HEAD
-            self.draw_ui_sprite(
-=======
             draw_ui_sprite(
->>>>>>> ralph
                 self.bar_knob_sprite,
                 knob_size,
                 knob_position,
@@ -315,17 +275,6 @@ class SettingsPopup():
             
             self.sfx_toggle_rect = sfx_rect
 
-<<<<<<< HEAD
-    def draw_ui_sprite(self, surface, size, position, anchor_point):
-        if surface:
-            scaled = py.transform.scale(surface, size)
-            rect = scaled.get_rect(**{anchor_point: position})
-            surface_blit(scaled, rect)
-            return True
-        return False
-
-=======
->>>>>>> ralph
     def display(self):
         if self.is_active:
             self.background()

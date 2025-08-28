@@ -574,7 +574,7 @@ class Game:
                 self.sounds['newlevel'].play()
                 self.stats_popup.update({
                   "highest_level": self.current_stage_index + 1,
-                   "annihilated": self.enemies_cleared_in_stage
+                   "annihilated": 0
                  })
                 self.create_stage_completion()
                 pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
@@ -727,7 +727,7 @@ class Game:
                             self.enemies_cleared_in_stage += 1
                             self.stats_popup.update({
                               "highest_level": self.current_stage_index + 1,
-                               "annihilated": self.enemies_cleared_in_stage
+                               "annihilated": 1
                              })
                             self.sounds['explosion'].play()
                             self.sounds['score'].play()

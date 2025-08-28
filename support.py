@@ -67,20 +67,6 @@ def draw_stars(display, stars, height):
         py.draw.rect(display, (200, 200, 220), (x, y, 2, 2))
     return new_stars
 
-<<<<<<< HEAD
-def debug_border(surface, x, y, width, height):
-    rect_x = x - (width // 2)
-    rect_y = y - (height // 2)
-    border_rect = py.Rect(rect_x, rect_y, width, height)
-
-    # Define the color red (R, G, B)
-    RED = (255, 0, 0)
-    # Define the border thickness
-    border_thickness = 2 # You can adjust this value
-
-    # Draw the rectangle border
-    py.draw.rect(surface, RED, border_rect, border_thickness)
-=======
 def get_master_sfx_volume() -> float:
     """
     Returns the current SFX volume (0.0 – 1.0) as set in SettingsPopup.
@@ -95,4 +81,3 @@ def draw_ui_sprite(surface, size, position, anchor_point):
         surface_blit(scaled, rect)
         return True
     return False
->>>>>>> ralph
