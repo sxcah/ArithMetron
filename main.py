@@ -89,14 +89,16 @@ def generate_problem(score):
         ops = ["+", "-"]
         a = random.randint(1, 20)
         b = random.randint(1, 20)
-        if random.choice(ops) == "-":
-            a, b = max(a, b), min(a, b)
     else:
         ops = ["+", "-", "*"]
         a = random.randint(2, 12)
         b = random.randint(2, 12)
 
     op = random.choice(ops)
+
+    if op == "-":
+        a, b = max(a, b), min(a, b)
+
     if op == "+":
         ans = a + b
         q = f"{a} + {b}"

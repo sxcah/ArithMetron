@@ -136,12 +136,17 @@ class MyStatsPopup:
             position = (x, y)
             draw_ui_sprite(file_name, size, position, anchor_point='center')
             
-            # Draw level digit
-            level_to_display = max(1, self.highest_level)  # Ensure at least 1
-            if level_to_display > 9:
-                digit_sprite = self.digits[9]
-            else:
-                digit_sprite = self.digits[level_to_display]
+            # Draw the highest level number
+            level_str = str(self.highest_level)
+            digit_width = 50
+            digit_height = 50
+            x_start = self.display_surface.get_width() // 2 - (len(level_str) * digit_width) // 2
+            for i, digit_char in enumerate(level_str):
+                digit_sprite = self.digits.get(int(digit_char))
+                if digit_sprite:
+                    digit_x = x_start + i * digit_width
+                    digit_y = self.display_surface.get_height() // 2 - 55
+                    draw_ui_sprite(digit_sprite, (digit_width, digit_height), (digit_x, digit_y), anchor_point='center')
             
             # Draw "LEVEL" text
             level_file_name = self.text_sprites['level']
@@ -152,14 +157,6 @@ class MyStatsPopup:
             level_y = self.display_surface.get_height() // 2 - 150
             level_position = (level_x, level_y)
             draw_ui_sprite(level_file_name, level_size, level_position, anchor_point='center')
-
-            digit_width = 50
-            digit_height = 50
-            digit_size = (digit_width, digit_height)
-            digit_x = self.display_surface.get_width() // 2
-            digit_y = self.display_surface.get_height() // 2 - 55
-            digit_position = (digit_x, digit_y)
-            draw_ui_sprite(digit_sprite, digit_size, digit_position, anchor_point='center')
 
     def draw_annihilated(self):
         """Draw the 'ANNIHILATED X' row"""
@@ -174,17 +171,17 @@ class MyStatsPopup:
             position = (x, y)
             draw_ui_sprite(file_name, size, position, anchor_point='center')
             
-            # Draw annihilated digit
-            annihilated_to_display = min(self.annihilated, 9)  # Cap at 9 for single digit display
-            digit_sprite = self.digits[annihilated_to_display]
-            
+            # Draw the annihilated number (as a string of digits)
+            annihilated_str = str(self.annihilated)
             digit_width = 50
             digit_height = 50
-            digit_size = (digit_width, digit_height)
-            digit_x = self.display_surface.get_width() // 2
-            digit_y = y + 100
-            digit_position = (digit_x, digit_y)
-            draw_ui_sprite(digit_sprite, digit_size, digit_position, anchor_point='center')
+            x_start = self.display_surface.get_width() // 2 - (len(annihilated_str) * digit_width) // 2
+            for i, digit_char in enumerate(annihilated_str):
+                digit_sprite = self.digits.get(int(digit_char))
+                if digit_sprite:
+                    digit_x = x_start + i * digit_width
+                    digit_y = y + 100
+                    draw_ui_sprite(digit_sprite, (digit_width, digit_height), (digit_x, digit_y), anchor_point='center')
 
     def draw_debug_info(self):
         """Draw debug information (optional)"""
