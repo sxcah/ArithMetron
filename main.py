@@ -503,7 +503,7 @@ class Game:
                     if hasattr(self.settings_popup, 'music_toggle_rect') and self.settings_popup.music_toggle_rect.collidepoint(event.pos):
                         self.settings_popup.toggle_music()
                     elif hasattr(self.settings_popup, 'sfx_toggle_rect') and self.settings_popup.sfx_toggle_rect.collidepoint(event.pos):
-                        self.settings_popup.sfx_enabled = not self.settings_popup.sfx_enabled
+                        self.settings_popup.toggle_sfx()
                     # If click was inside settings popup, don't close it
                     elif self.settings_popup.rect.collidepoint(event.pos):
                         pass  # Click was inside popup, do nothing

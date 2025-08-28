@@ -5,7 +5,7 @@ from settings import *
 from stats import *
 
 class SettingsPopup():
-     def _init_sounds(self):
+    def _init_sounds(self):
         self.sounds = {
             'laser'    : py.mixer.Sound(laser_sfx),
             'explosion': py.mixer.Sound(explosion_sfx),
@@ -15,7 +15,7 @@ class SettingsPopup():
             'hover'    : py.mixer.Sound(hover_sfx),
         }
 
-     def __init__(self):
+    def __init__(self):
         self.display_surface = py.display.get_surface()
 
         self.background_sprite = load_image(settings_background)
@@ -61,8 +61,8 @@ class SettingsPopup():
 
         self.sounds = {}
         self._init_sounds()
-        
-     def play_menu_music(self):
+    
+    def play_menu_music(self):
         if self.music_enabled and menu_bgm:
             try:
                 if self.current_music != "menu":
@@ -73,7 +73,7 @@ class SettingsPopup():
             except py.error as e:
                 print(f"Warning: Could not load menu music: {e}")
 
-     def play_game_music(self):
+    def play_game_music(self):
         if self.music_enabled and game_bgm:
             try:
                 if self.current_music != "play":
@@ -84,16 +84,16 @@ class SettingsPopup():
             except py.error as e:
                 print(f"Warning: Could not load game music: {e}")
 
-     def stop_music(self):
+    def stop_music(self):
         py.mixer.music.stop()
         self.current_music = None
 
-     def set_music_volume(self, volume):
+    def set_music_volume(self, volume):
         self.music_volume = max(0.0, min(1.0, volume))
         if py.mixer.music.get_busy():
             py.mixer.music.set_volume(self.music_volume)
 
-     def set_sfx_volume(self, volume):
+    def set_sfx_volume(self, volume):
         self.sfx_volume = max(0.0, min(1.0, volume))
         for key, snd in self.sounds.items():
             if key == 'explosion':
@@ -101,14 +101,22 @@ class SettingsPopup():
             else:
                 snd.set_volume(self.sfx_volume)
 
-     def toggle_music(self):
+    def toggle_music(self):
         self.music_enabled = not self.music_enabled
         if not self.music_enabled:
             py.mixer.music.pause()
         else:
             py.mixer.music.unpause()
 
-     def handle_event(self, event):
+    def toggle_sfx(self):
+        self.sfx_enabled = not self.sfx_enabled
+        if not self.sfx_enabled:
+            for sound in self.sounds.values():
+                sound.set_volume(0)  # Mute all sounds
+        else:
+            self.set_sfx_volume(self.sfx_volume)
+
+    def handle_event(self, event):
         if not self.is_active:
             return
             
@@ -162,7 +170,7 @@ class SettingsPopup():
                 new_volume = max(0.0, min(1.0, relative_x / bar_size[0]))
                 self.set_sfx_volume(new_volume)
 
-     def background(self):
+    def background(self):
         if self.is_active:
             file_name = self.background_sprite
             width = (self.display_surface.get_width() // 2 + 75)
@@ -173,7 +181,7 @@ class SettingsPopup():
             position = (x, y)
             draw_ui_sprite(file_name, size, position, anchor_point='center')
 
-     def draw_music_controls(self):
+    def draw_music_controls(self):
         if self.is_active:
             file_name = self.music_sprite
             width = (225)
@@ -190,7 +198,7 @@ class SettingsPopup():
                 label="Music"
             )
 
-     def draw_sfx_controls(self):
+    def draw_sfx_controls(self):
         if self.is_active:
             file_name = self.sound_sprite
             width = (225)
@@ -207,7 +215,7 @@ class SettingsPopup():
                 label="Sound"
             )
 
-     def draw_slider(self, y_offset, volume, label):
+    def draw_slider(self, y_offset, volume, label):
         if self.is_active:
             bar_size = (325, 50)
             bar_pos_x = self.display_surface.get_width() // 2
@@ -243,7 +251,7 @@ class SettingsPopup():
             ))
             self.display_surface.blit(volume_text, volume_rect)
 
-     def draw_toggle_buttons(self):
+    def draw_toggle_buttons(self):
         if self.is_active:
             font = self.font['med']
             
@@ -267,7 +275,7 @@ class SettingsPopup():
             
             self.sfx_toggle_rect = sfx_rect
 
-     def display(self):
+    def display(self):
         if self.is_active:
             self.background()
             self.draw_sfx_controls()
