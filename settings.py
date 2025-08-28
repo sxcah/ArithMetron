@@ -33,8 +33,9 @@ hover_sfx = r'assets/sfx/sound effects/hoverbutton1.wav'
 LIVES = 3
 
 player_folder_path = 'assets/entity/player/'
+enemy_folder_path = 'assets/entity/enemy/'
 player_filenames = [f"{player_folder_path}1.png", f"{player_folder_path}2.png"]
-enemy_filenames = ["enemy1.png", "enemy2.png"]
+enemy_filenames = [f"{enemy_folder_path}1.png", f"{enemy_folder_path}2.png"]
 explosion_filenames = ["explosion.png"]
 laser_filenames = ["lazer.png"]
 levels_filename = "levels.png"
