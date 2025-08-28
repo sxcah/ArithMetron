@@ -22,6 +22,17 @@ WHITE = (255, 255, 255)
 menu_bgm = r'assets/sfx/music/bgm.mp3'
 game_bgm = r'assets/sfx/music/game_bgm.mp3'
 
+<<<<<<< HEAD
+=======
+# Sound effects
+new_level_sfx = r'assets/sfx/sound effects/new level/going-to-the-next-level-114480.mp3'
+score_sfx = r'assets/sfx/sound effects/score/achievement-video-game-type-1-230515.mp3'
+game_over_sfx = r'assets/sfx/sound effects/gameover/gameover.wav'
+explosion_sfx = r'assets/sfx/sound effects/explosions/8-bit-explosion-10-340462.mp3'
+laser_sfx       = r'assets/sfx/sound effects/laser/laser-104024.mp3'
+hover_sfx = r'assets/sfx/sound effects/hoverbutton1.wav'
+
+>>>>>>> ralph
 LIVES = 3
 
 player_filenames = ["player1.png", "player2.png"]
@@ -43,9 +54,15 @@ FONT_SIZE = {
 }
 
 # Stages
+<<<<<<< HEAD
 DIFFICULTY_STAGESS = [
     # Stage 1
     {"spawn_interval": 500,"enemy_speed": 4, "enemies_to_clear": 1},
+=======
+DIFFICULTY_STAGES = [
+    # Stage 1
+    {"spawn_interval": 500,"enemy_speed": 4, "enemies_to_clear": 3},
+>>>>>>> ralph
     # Stage 2
     {"spawn_interval": 3000,"enemy_speed": 2, "enemies_to_clear": 4},
     # Stage 3   
@@ -76,7 +93,11 @@ DIFFICULTY_STAGESS = [
     {"spawn_interval": 3000, "enemy_speed": 2, "enemies_to_clear": 20},
 ]
 
+<<<<<<< HEAD
 DIFFICULTY_STAGES = [
+=======
+DIFFICULTY_STAGESS = [
+>>>>>>> ralph
     # Stage 1
     {"spawn_interval": 1000,"enemy_speed": 3, "enemies_to_clear": 3}
 ]
