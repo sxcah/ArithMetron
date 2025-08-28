@@ -1,6 +1,6 @@
 import pygame as py
 
-from support import surface_blit, load_image, load_font
+from support import *
 from settings import *
 
 class SettingsPopup():
