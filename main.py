@@ -544,6 +544,7 @@ class Game:
 
             elif self.game_state == "level_cleared":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    self.ui.add_life()
                     self.proceed_to_next_stage()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.return_to_menu()
