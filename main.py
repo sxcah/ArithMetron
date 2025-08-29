@@ -296,7 +296,7 @@ class Game:
         self.font_med = pygame.font.Font(None, 24)
         self.font_small = pygame.font.Font(None, 18)
 
-        self.game_background_anim = AnimatedBackground('assets/background/in_game/', num_frames=26, animation_speed=150)
+        self.game_background_anim = AnimatedBackground('assets/background/in_game/', num_frames=26, animation_speed=50)
         self.menu_background_anim = AnimatedBackground('assets/background/main/', num_frames=1, animation_speed=150)
 
         # DO NOT REMOVE
@@ -580,6 +580,8 @@ class Game:
         self.buttons.empty()  # Clear existing buttons
         self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
         self.spaceship_group.add(self.spaceship)
+        self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
+        self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
 
         button_path = "assets/ui_ux/play_button"
         play_button_states = load_button_images(button_path, scale=self.play_button_size)
