@@ -88,27 +88,27 @@ DIFFICULTY_STAGES = [
     # Stage 4
     {"spawn_interval": 1000,"enemy_speed": 2, "enemies_to_clear": 6},
     # Stage 5
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 7},
+    {"spawn_interval": 1000, "enemy_speed": 2.5, "enemies_to_clear": 7},
     # Stage 6
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 8},
+    {"spawn_interval": 1000, "enemy_speed": 2.5, "enemies_to_clear": 8},
     # Stage 7
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 10},
+    {"spawn_interval": 1000, "enemy_speed": 2.5, "enemies_to_clear": 10},
     # Stage 8
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 10},
+    {"spawn_interval": 1000, "enemy_speed": 2.5, "enemies_to_clear": 10},
     # Stage 9
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 10},
+    {"spawn_interval": 1000, "enemy_speed": 3, "enemies_to_clear": 10},
     # Stage 10
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 10},
+    {"spawn_interval": 1000, "enemy_speed": 3, "enemies_to_clear": 10},
     # Stage 11
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 12},
+    {"spawn_interval": 1000, "enemy_speed": 3, "enemies_to_clear": 12},
     # Stage 12
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 14},
+    {"spawn_interval": 1000, "enemy_speed": 3, "enemies_to_clear": 14},
     # Stage 13
     {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 16},
     # Stage 14
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 18},
+    {"spawn_interval": 1000, "enemy_speed": 3.5, "enemies_to_clear": 18},
     # Stage 15
-    {"spawn_interval": 1000, "enemy_speed": 2, "enemies_to_clear": 20},
+    {"spawn_interval": 1000, "enemy_speed": 3.5, "enemies_to_clear": 20},
 ]
 
 DIFFICULTY_STAGESS = [
@@ -127,3 +127,4 @@ settings_music_text = 'assets/ui_ux/settings/text/music.png'
 settings_sounds_text = 'assets/ui_ux/settings/text/sound.png'
 
 menu_background = 'assets/background/main_background.png'
+game_title_sprite = 'assets/ui_ux/main_menu/arithmetron.png'

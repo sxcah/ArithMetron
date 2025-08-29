@@ -333,9 +333,17 @@ class Game:
         self.menu_buttons_y_start = self.spaceship_initial_y + 150 
         self.button_spacing = 105
 
+        self.title_game_sprite = load_image(game_title_sprite)
+        self.title_game_scaled = pygame.transform.scale(self.title_game_sprite, (325, 100))
+        self.title_game_rect = self.title_game_scaled.get_rect(center=(SCREEN_WIDTH // 2,
+                                                                       SCREEN_HEIGHT * 0.12))
+        
+
+
+        """
         self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
         self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
-
+        """
         self.spaceship_launch_speed = -9
         self.menu_animation_speed = 40
         
@@ -427,7 +435,7 @@ class Game:
         self.settings_popup.play_menu_music()
 
     def update_menu_animation(self, dt):
-        self.title_rect.y += self.menu_animation_speed
+        self.title_game_rect.y += self.menu_animation_speed
         for button in self.buttons:
             if isinstance(button, Button):
                  button.update()
@@ -444,7 +452,7 @@ class Game:
         self.game_state = "play_animation"
         self.is_animation_finished = False
         self.spaceship.rect.center = (SCREEN_WIDTH // 2, self.spaceship_initial_y) 
-        self.title_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12)
+        self.title_game_rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12)
         for i, button in enumerate(self.buttons):
             if isinstance(button, Button):
                  button.rect.centery = self.menu_buttons_y_start + i * self.button_spacing
@@ -580,9 +588,16 @@ class Game:
         self.buttons.empty()  # Clear existing buttons
         self.spaceship = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, self.spaceship_initial_y)
         self.spaceship_group.add(self.spaceship)
+
+        self.title_game_sprite = load_image(game_title_sprite)
+        self.title_game_scaled = pygame.transform.scale(self.title_game_sprite, (325, 100))
+        self.title_game_rect = self.title_game_scaled.get_rect(center=(SCREEN_WIDTH // 2,
+                                                                       SCREEN_HEIGHT * 0.12))
+
+        """
         self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
         self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
-
+        """
         button_path = "assets/ui_ux/play_button"
         play_button_states = load_button_images(button_path, scale=self.play_button_size)
         levels_img   = load_static_button(levels_filename, scale=self.levels_button_size)
@@ -648,7 +663,7 @@ class Game:
             if self.game_state == "menu" or self.game_state == "play_animation":
                 self.menu_background_anim.update(dt)
                 self.screen.blit(self.menu_background_anim.get_current_frame(), (0, 0))
-                self.screen.blit(self.title_surf, self.title_rect)
+                surface_blit(self.title_game_scaled, self.title_game_rect)
                 self.spaceship_group.update(dt)
                 self.spaceship_group.draw(self.screen)
             else: # "play", "game_cleared", "level_cleared"
