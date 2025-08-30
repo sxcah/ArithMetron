@@ -367,6 +367,7 @@ class Game:
             'newlevel' : pygame.mixer.Sound(new_level_sfx),
             'gameover' : pygame.mixer.Sound(game_over_sfx),
             'hover'    : pygame.mixer.Sound(hover_sfx),
+            'gamewin'  : pygame.mixer.Sound(victory_sfx)
         }
         # Explosion is louder than score
         self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)
@@ -527,7 +528,7 @@ class Game:
             elif self.game_state == "play" and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
                 if event.type == SPAWN_EVENT and self.enemies_spawned_in_stage < self.current_stage["enemies_to_clear"]:
-                    e = AnimatedEnemy(self.enemy_frames, self.font_med, self.score, self.current_stage["enemy_speed"])
+                    e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"])
                     self.enemies.add(e)
                     self.all_sprites.add(e)
                     self.enemies_spawned_in_stage += 1
@@ -544,7 +545,8 @@ class Game:
 
             elif self.game_state == "level_cleared":
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    self.ui.add_life()
+                    if self.ui.lives < LIVES:
+                        self.ui.add_life()
                     self.proceed_to_next_stage()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.return_to_menu()
@@ -565,7 +567,6 @@ class Game:
             else:
                 # Stage cleared but more stages remain
                 self.game_state = "level_cleared"
-                self.sounds['newlevel'].play()
                 self.stats_popup.update({
                   "highest_level": self.current_stage_index + 1,
                    "annihilated": 0
@@ -783,10 +784,12 @@ class Game:
                     self.game_over_screen.update(dt)
 
             elif self.game_state == "game_cleared":
+                self.sounds['gamewin'].play()
                 self.game_cleared.display()
                 self.game_cleared.update(dt)
 
             elif self.game_state == "level_cleared":
+                self.sounds['gamewin'].play()
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
 

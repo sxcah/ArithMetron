@@ -7,12 +7,13 @@ from stats import *
 class SettingsPopup():
     def _init_sounds(self):
         self.sounds = {
-            'laser'    : py.mixer.Sound(laser_sfx),
-            'explosion': py.mixer.Sound(explosion_sfx),
-            'score'    : py.mixer.Sound(score_sfx),
-            'newlevel' : py.mixer.Sound(new_level_sfx),
-            'gameover' : py.mixer.Sound(game_over_sfx),
-            'hover'    : py.mixer.Sound(hover_sfx),
+            'laser'    : pygame.mixer.Sound(laser_sfx),
+            'explosion': pygame.mixer.Sound(explosion_sfx),
+            'score'    : pygame.mixer.Sound(score_sfx),
+            'newlevel' : pygame.mixer.Sound(new_level_sfx),
+            'gameover' : pygame.mixer.Sound(game_over_sfx),
+            'hover'    : pygame.mixer.Sound(hover_sfx),
+            'gamewin'  : pygame.mixer.Sound(victory_sfx)
         }
 
     def __init__(self):
