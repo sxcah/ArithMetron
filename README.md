@@ -1,0 +1,8 @@
+Welcome to ArithMetron: A Game of Numerical Combat!
+Welcome, cadet, to the front lines of the ArithMetron Quadrant! Our galaxy is under siege by a relentless armada of rogue numerical entities. These are not just any enemy ships; they are sentient equations, and their only weakness is a direct, correct answer. Your mission, should you choose to accept it, is to pilot the last remaining ArithMetron vessel and use your wits to solve their weak spots and save our universe.
+
+The fate of all reality rests on your ability to perform rapid-fire calculations. Each enemy ship you encounter will display a mathematical problem on its hull, its very essence defined by the numbers it presents. Your onboard targeting system, a sophisticated "Input & Annihilate" box, is your only weapon. To destroy an enemy, you must quickly and accurately solve the equation it displays and input the correct answer. For instance, if a menacing numerical ship shows "5 + 3 = ?", you must input "8" to annihilate it in a flash of brilliant light.
+
+As you progress, the enemy forces will become more formidable, presenting more complex problems—subtraction, multiplication, and even multi-step equations. The speed of the approaching ships will also increase, testing not only your mathematical skills but also your reflexes and composure under pressure. Our intelligence suggests that their leaders, the dreaded "Prime Sentinels," are nearly indestructible without flawless calculations.
+
+The universe is counting on you, pilot. Your knowledge is our shield, and your speed is our salvation. Good luck, and may your mind be swift and your aim be true!
