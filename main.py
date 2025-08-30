@@ -7,7 +7,7 @@ from game_over import GameOver
 from background import AnimatedBackground
 from pop_up import *
 from support import draw_stars
-from stats import MyStatsPopup
+from Stats import MyStatsPopup
 
 pygame.mixer.init()
 
