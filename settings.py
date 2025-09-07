@@ -124,7 +124,7 @@ DIFFICULTY_STAGES = [
     # Stage 5
     {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
     # Stage 6
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 8},
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
     # Stage 7
     {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
     # Stage 8

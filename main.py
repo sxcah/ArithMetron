@@ -619,24 +619,39 @@ class Game:
     def check_stage_completion(self):
         """Check if the current stage is completed and handle transition"""
         if self.enemies_cleared_in_stage >= self.current_stage["enemies_to_clear"]:
-            # Check if it's a boss stage (every 5 levels)
+            # If it's a boss stage, transition directly to the boss battle
             if (self.current_stage_index + 1) % 5 == 0:
                 self.game_state = "boss_battle"
+                self.spawn_boss()
+            else:
+                # Otherwise, show the "level cleared" screen
+                self.game_state = "level_cleared"
+                self.stats_popup.update({
+                    "highest_level": self.current_stage_index + 1,
+                    "annihilated": 0
+                })
+                self.create_stage_completion()
+            
+            # In either case, stop the regular enemy spawning
+            pygame.time.set_timer(SPAWN_EVENT, 0)
+
+    def spawn_boss(self):
+        self.game_state = "boss_battle"
+        pygame.time.set_timer(SPAWN_EVENT, 0)
+        self.enemies.empty()
+        self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=10)
+        self.enemies.add(self.boss)
+        self.all_sprites.add(self.boss)
+
+    """
+    self.game_state = "boss_battle"
                 # Spawn the boss
                 self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=10)
                 self.enemies.add(self.boss)
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
                 pygame.time.set_timer(SPAWN_EVENT, 1000)
-            else:
-                # Stage cleared but more stages remain
-                self.game_state = "level_cleared"
-                self.stats_popup.update({
-                  "highest_level": self.current_stage_index + 1,
-                   "annihilated": 0
-                 })
-                self.create_stage_completion()
-                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
+    """
 
     """def check_stage_completion(self):
         if self.enemies_cleared_in_stage >= self.current_stage["enemies_to_clear"]:
