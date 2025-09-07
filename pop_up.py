@@ -2,7 +2,7 @@ import pygame as py
 
 from support import surface_blit, load_image, load_font, draw_ui_sprite
 from settings import *
-from stats import *
+from Stats import *
 
 class SettingsPopup():
     def _init_sounds(self):
