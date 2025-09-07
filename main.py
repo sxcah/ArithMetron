@@ -7,7 +7,7 @@ from game_over import GameOver
 from background import AnimatedBackground
 from pop_up import *
 from support import draw_stars
-from stats import MyStatsPopup
+from Stats import MyStatsPopup
 
 pygame.mixer.init()
 
@@ -158,13 +158,26 @@ class AnimatedEnemy(AnimatedSprite):
 
     def update(self, dt):
         super().update(dt)
-        self.text_rect.center = (self.rect.centerx, self.rect.centery)
+        self.text_rect.center = (self.rect.centerx, self.rect.centery + (10 * 6))
 
     def draw_text(self, screen):
         box_padding = 5
         box_rect = self.text_rect.inflate(box_padding * 2, box_padding * 2)
         s = pygame.Surface(box_rect.size, pygame.SRCALPHA)
-        s.fill((0, 0, 0, 150))
+        s.fill((255, 215, 0, 75))
+        
+        border_color = (255, 215, 0)
+        border_thickness = 2
+        border_length = 20 # Adjust this to control the length of the corner lines
+
+        # Draw top-left corner
+        pygame.draw.line(s, border_color, (0, 0), (border_length, 0), border_thickness)
+        pygame.draw.line(s, border_color, (0, 0), (0, border_length), border_thickness)
+
+        # Draw bottom-right corner
+        pygame.draw.line(s, border_color, (s.get_width() - border_length, s.get_height() - 1), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+        pygame.draw.line(s, border_color, (s.get_width() - 1, s.get_height() - border_length), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+
         screen.blit(s, box_rect.topleft)
         screen.blit(self.text_surf, self.text_rect)
 

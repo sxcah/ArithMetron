@@ -81,7 +81,7 @@ FONT_SIZE = {
 # Stages
 DIFFICULTY_STAGES = [
     # Stage 1
-    {"spawn_interval": 1000,"enemy_speed": 1.5, "enemies_to_clear": 3},
+    {"spawn_interval": 100,"enemy_speed": 1.5, "enemies_to_clear": 3},
     # Stage 2
     {"spawn_interval": 1000,"enemy_speed": 2.5, "enemies_to_clear": 4},
     # Stage 3   
