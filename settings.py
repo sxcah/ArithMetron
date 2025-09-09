@@ -32,6 +32,7 @@ hover_sfx = r'assets/sfx/sound effects/hoverbutton1.wav'
 victory_sfx = r'assets/sfx/sound effects/new level/game_win.mp3'
 
 LIVES = 3
+SHIELD = 0
 
 player_folder_path = 'assets/entity/player/'
 enemy_folder_path = 'assets/entity/enemy/'
@@ -46,6 +47,10 @@ player_filenames = [f"{player_folder_path}1.png",
                     f"{player_folder_path}2.png"
                     ]
 enemy_filenames = [f"{enemy_folder_path}1.png",
+                   f"{enemy_folder_path}2.png"
+                   ]
+
+boss_filenames = [f"{enemy_folder_path}1.png",
                    f"{enemy_folder_path}2.png"
                    ]
 
@@ -137,3 +142,7 @@ settings_sounds_text = 'assets/ui_ux/settings/text/sound.png'
 
 menu_background = 'assets/background/main_background.png'
 game_title_sprite = 'assets/ui_ux/main_menu/arithmetron.png'
+
+# Shield = 3
+# Time Slow DIFFSTAGE["enemy_speed"] - 2
+# Nuke

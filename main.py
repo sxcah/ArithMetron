@@ -14,7 +14,7 @@ pygame.mixer.init()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
-def load_frames(filenames, default_color, is_player=True):
+def load_frames(filenames, default_color, sizex=100, sizey=100, is_player=True):
     frames = []
     script_dir = "" 
     
@@ -22,13 +22,13 @@ def load_frames(filenames, default_color, is_player=True):
         for filename in filenames:
             path = os.path.join(script_dir, filename)
             img = pygame.image.load(path).convert_alpha()
-            img = pygame.transform.scale(img, (100, 100))
+            img = pygame.transform.scale(img, (sizex, sizey))
             frames.append(img)
     except (pygame.error, FileNotFoundError) as e:
         print(f"Warning: Could not load assets: {e}. Using placeholders.")
         frames = []
         for i in range(4):
-            surf = pygame.Surface((60, 60), pygame.SRCALPHA)
+            surf = pygame.Surface((150, 150), pygame.SRCALPHA)
             if is_player:
                 pygame.draw.circle(surf, SHIP_COLOR, (30, 30), 30)
                 pulsing_color = (100 + i*20, 180 + i*10, 255 - i*20)
@@ -372,6 +372,7 @@ class Game:
 
         self.player_frames = load_frames(player_filenames, SHIP_COLOR, is_player=True)
         self.enemy_frames = load_frames(enemy_filenames, ENEMY_COLOR, is_player=False)
+        self.boss_frames = load_frames(boss_filenames, ENEMY_COLOR, 400, 100, is_player=False)
         self.explosion_frames = load_frames(explosion_filenames, (255, 165, 0), is_player=False)
         self.laser_frames = load_frames(laser_filenames, (255, 50, 50), is_player=False)
         
@@ -623,7 +624,7 @@ class Game:
             if (self.current_stage_index + 1) % 5 == 0:
                 self.game_state = "boss_battle"
                 # Spawn the boss
-                self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
+                self.boss = Boss(self.boss_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=10)
                 self.enemies.add(self.boss)
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
@@ -889,22 +890,10 @@ class Game:
                         enemy.draw_health_bar(self.screen)
 
                 self.ui.display(stage_number=self.current_stage_index + 1, score=self.score)
-
-                if self.paused:
-                    pause_overlay = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-                    pause_overlay.fill((0, 0, 0, 128))
-                    self.screen.blit(pause_overlay, (0, 0))
                     
-                    pause_text = self.font_big.render("PAUSED", True, WHITE)
-                    pause_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-                    self.screen.blit(pause_text, pause_rect)
-                    
-                    resume_text = self.font_med.render("Press P to Resume", True, TEXT_COLOR)
-                    resume_rect = resume_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
-                    self.screen.blit(resume_text, resume_rect)
-                elif self.game_over:
-                    self.game_over_screen.display()
-                    self.game_over_screen.update(dt)
+            elif self.game_over:
+                self.game_over_screen.display()
+                self.game_over_screen.update(dt)
 
             elif self.game_state == "game_cleared":
                 self.sounds['gamewin'].play()
