@@ -79,9 +79,9 @@ FONT_SIZE = {
 }
 
 # Stages
-DIFFICULTY_STAGES = [
+"""DIFFICULTY_STAGES = [
     # Stage 1
-    {"spawn_interval": 1000,"enemy_speed": 1.5, "enemies_to_clear": 3},
+    {"spawn_interval": 100,"enemy_speed": 1.5, "enemies_to_clear": 3},
     # Stage 2
     {"spawn_interval": 1000,"enemy_speed": 2.5, "enemies_to_clear": 4},
     # Stage 3   
@@ -109,12 +109,40 @@ DIFFICULTY_STAGES = [
     # Stage 14
     {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
     # Stage 15
-    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},
-]
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
+]"""
 
-DIFFICULTY_STAGESS = [
+DIFFICULTY_STAGES = [
     # Stage 1
-    {"spawn_interval": 1000,"enemy_speed": 3, "enemies_to_clear": 3}
+    {"spawn_interval": 100,"enemy_speed": 1.5, "enemies_to_clear": 1},
+    # Stage 2
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
+    # Stage 3   
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
+    # Stage 4
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
+    # Stage 5
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
+    # Stage 6
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
+    # Stage 7
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+    # Stage 8
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+    # Stage 9
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+    # Stage 10
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+    # Stage 11
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 12},
+    # Stage 12
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 14},
+    # Stage 13
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 16},
+    # Stage 14
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
+    # Stage 15
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
 ]
 
 settings_background = 'assets/ui_ux/settings/tab.png'

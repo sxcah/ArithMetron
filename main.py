@@ -158,15 +158,71 @@ class AnimatedEnemy(AnimatedSprite):
 
     def update(self, dt):
         super().update(dt)
-        self.text_rect.center = (self.rect.centerx, self.rect.centery)
+        self.text_rect.center = (self.rect.centerx, self.rect.centery + (10 * 6))
 
     def draw_text(self, screen):
         box_padding = 5
         box_rect = self.text_rect.inflate(box_padding * 2, box_padding * 2)
         s = pygame.Surface(box_rect.size, pygame.SRCALPHA)
-        s.fill((0, 0, 0, 150))
+        s.fill((255, 215, 0, 75))
+        
+        border_color = (255, 215, 0)
+        border_thickness = 2
+        border_length = 20 # Adjust this to control the length of the corner lines
+
+        # Draw top-left corner
+        pygame.draw.line(s, border_color, (0, 0), (border_length, 0), border_thickness)
+        pygame.draw.line(s, border_color, (0, 0), (0, border_length), border_thickness)
+
+        # Draw bottom-right corner
+        pygame.draw.line(s, border_color, (s.get_width() - border_length, s.get_height() - 1), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+        pygame.draw.line(s, border_color, (s.get_width() - 1, s.get_height() - border_length), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+
         screen.blit(s, box_rect.topleft)
         screen.blit(self.text_surf, self.text_rect)
+
+class Boss(AnimatedEnemy):
+    def __init__(self, frames, font, score, speed, health):
+        # Set a fixed, slow speed for the boss
+        boss_speed = 0.05
+        # Pass the correct parameters to the parent class, using the new boss_speed
+        super().__init__(frames, font, score * 2, boss_speed)
+        
+        # Set a fixed starting position for the boss
+        self.rect.centerx = SCREEN_WIDTH // 2
+        self.rect.y = -100
+        self.target_y = SCREEN_HEIGHT * 0.25 # Boss will stop at 25% of the screen height
+
+        self.health = health
+        self.max_health = health
+    
+    def update(self, dt):
+        # Boss moves down until it reaches the target_y
+        if self.rect.y < self.target_y:
+            self.rect.y += self.speed * dt
+        
+        self.animation_timer += dt
+        if self.animation_timer >= self.animation_speed:
+            self.animation_timer = 0
+            self.frame_index = (self.frame_index + 1) % len(self.frames)
+            self.image = self.frames[self.frame_index]
+            
+        self.text_rect.center = (self.rect.centerx, self.rect.centery + (10 * 6))
+
+    def take_damage(self):
+        self.health -= 1
+        return self.health <= 0
+    
+    def draw_health_bar(self, screen):
+        bar_width = self.rect.width
+        bar_height = 10
+        fill_width = (self.health / self.max_health) * bar_width
+        
+        outline_rect = pygame.Rect(self.rect.x, self.rect.y - 15, bar_width, bar_height)
+        fill_rect = pygame.Rect(self.rect.x, self.rect.y - 15, fill_width, bar_height)
+
+        pygame.draw.rect(screen, (255, 0, 0), fill_rect)
+        pygame.draw.rect(screen, (255, 255, 255), outline_rect, 2)
 
 class Laser(AnimatedSprite):
     def __init__(self, frames, start_pos, target_pos):
@@ -389,6 +445,7 @@ class Game:
         self.ui = UI()
         self.staged_cleared = None
         self.game_cleared = None
+        self.boss = None
         
         # Call the new function to create the UI
         self.create_menu_ui()
@@ -525,13 +582,18 @@ class Game:
                                     button.action()
                     self.levels_window.handle_event(event)
 
-            elif self.game_state == "play" and not self.game_over and not self.paused:
+            elif (self.game_state == "play" or self.game_state == "boss_battle") and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
-                if event.type == SPAWN_EVENT and self.enemies_spawned_in_stage < self.current_stage["enemies_to_clear"]:
-                    e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"])
-                    self.enemies.add(e)
-                    self.all_sprites.add(e)
-                    self.enemies_spawned_in_stage += 1
+                if event.type == SPAWN_EVENT:
+                    if self.game_state == "play" and self.enemies_spawned_in_stage < self.current_stage["enemies_to_clear"]:
+                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"])
+                        self.enemies.add(e)
+                        self.all_sprites.add(e)
+                        self.enemies_spawned_in_stage += 1
+                    elif self.game_state == "boss_battle" and len(self.enemies) < 5: # Limit the number of enemies during the boss fight
+                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, (self.current_stage["enemy_speed"] - 2))
+                        self.enemies.add(e)
+                        self.all_sprites.add(e)
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     self.return_to_menu()
@@ -544,6 +606,7 @@ class Game:
                 self.return_to_menu()
 
             elif self.game_state == "level_cleared":
+                self.enemies.empty()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     if self.ui.lives < LIVES:
                         self.ui.add_life()
@@ -555,6 +618,27 @@ class Game:
 
     def check_stage_completion(self):
         """Check if the current stage is completed and handle transition"""
+        if self.enemies_cleared_in_stage >= self.current_stage["enemies_to_clear"]:
+            # Check if it's a boss stage (every 5 levels)
+            if (self.current_stage_index + 1) % 5 == 0:
+                self.game_state = "boss_battle"
+                # Spawn the boss
+                self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
+                self.enemies.add(self.boss)
+                self.all_sprites.add(self.boss)
+                # Restart the spawn timer for the boss fight
+                pygame.time.set_timer(SPAWN_EVENT, 1000)
+            else:
+                # Stage cleared but more stages remain
+                self.game_state = "level_cleared"
+                self.stats_popup.update({
+                  "highest_level": self.current_stage_index + 1,
+                   "annihilated": 0
+                 })
+                self.create_stage_completion()
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
+
+    """def check_stage_completion(self):
         if self.enemies_cleared_in_stage >= self.current_stage["enemies_to_clear"]:
             # Check if all stages are completed
             if self.current_stage_index >= len(DIFFICULTY_STAGES) - 1:
@@ -572,7 +656,7 @@ class Game:
                    "annihilated": 0
                  })
                 self.create_stage_completion()
-                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily"""
 
     def proceed_to_next_stage(self):
         """Proceed to the next stage after level cleared screen"""
@@ -695,7 +779,7 @@ class Game:
                 if self.spaceship.rect.bottom <= 0:
                     self.reset_game()
             
-            elif self.game_state == "play":
+            elif self.game_state == "play" or self.game_state == "boss_battle":
                 self.settings_popup.play_game_music()
                 if not self.game_over and not self.paused:
                     self.all_sprites.update(dt)
@@ -710,6 +794,7 @@ class Game:
                         if typed_val is not None:
                             matched = None
                             closest_y = -1
+                            # Match the answer with any enemy or the boss
                             for e in self.enemies:
                                 if typed_val == e.answer and e.rect.y > closest_y:
                                     closest_y = e.rect.y
@@ -722,27 +807,51 @@ class Game:
                                 self.sounds['laser'].play()
 
                     # Handle Hits for hitting enemy
-                    hits = pygame.sprite.groupcollide(self.lasers, self.enemies, True, True)
+                    hits = pygame.sprite.groupcollide(self.lasers, self.enemies, True, False) # Don't kill enemy automatically
                     
-                    all_enemies_hit = [enemy for enemies_list in hits.values() for enemy in enemies_list]
-                    unique_enemies = set(all_enemies_hit)
-
-                    for enemy in unique_enemies:
-                        explosion = Explosion(self.explosion_frames, enemy.rect.center)
-                        self.explosions.add(explosion)
-                        self.all_sprites.add(explosion)
-                        
-                        self.score += 10
-                        self.enemies_cleared_in_stage += 1
-                        self.stats_popup.update({
-                            "highest_level": self.current_stage_index + 1,
-                            "annihilated": 1
-                        })
-                        self.sounds['explosion'].play()
-                        self.sounds['score'].play()
+                    for laser, enemies_hit in hits.items():
+                        for enemy in enemies_hit:
+                            # If it's the boss, handle damage
+                            if isinstance(enemy, Boss):
+                                if enemy.take_damage():
+                                    # Remove all enemies (including boss) from both groups
+                                    for e in list(self.enemies):
+                                        self.enemies.remove(e)
+                                        self.all_sprites.remove(e)
+                                    explosion = Explosion(self.explosion_frames, enemy.rect.center)
+                                    self.explosions.add(explosion)
+                                    self.all_sprites.add(explosion)
+                                    # Boss is defeated, transition to level cleared
+                                    self.game_state = "level_cleared"
+                                    self.create_stage_completion()
+                                    self.sounds['explosion'].play()
+                                    self.sounds['gamewin'].play()
+                                    self.sounds['score'].play()
+                                else:
+                                    # Generate a new problem for the boss
+                                    enemy.question, enemy.answer = generate_problem(self.score)
+                                    enemy.text_surf = enemy.font.render(enemy.question, True, TEXT_COLOR)
+                                    enemy.text_rect = enemy.text_surf.get_rect(center=(enemy.rect.centerx, enemy.rect.centery + (10 * 6)))
+                                    self.sounds['score'].play()
+                            else:
+                                # Regular enemy logic
+                                self.enemies.remove(enemy)
+                                self.all_sprites.remove(enemy)
+                                explosion = Explosion(self.explosion_frames, enemy.rect.center)
+                                self.explosions.add(explosion)
+                                self.all_sprites.add(explosion)
+                                self.score += 10
+                                self.enemies_cleared_in_stage += 1
+                                self.stats_popup.update({
+                                    "highest_level": self.current_stage_index + 1,
+                                    "annihilated": 1
+                                })
+                                self.sounds['explosion'].play()
+                                self.sounds['score'].play()
+                                
+                    if self.game_state == "play": # Only check for completion if still in play mode
+                        self.check_stage_completion()
                     
-                    self.check_stage_completion()
-
                     # Handles Losing Life
                     for e in list(self.enemies):
                         if e.rect.bottom >= SCREEN_HEIGHT - 60:
@@ -751,7 +860,8 @@ class Game:
                             self.ui.lose_life()
                             self.lives = self.ui.lives
                             self.input_box.text = ""
-                            self.enemies_spawned_in_stage -= 1
+                            if isinstance(e, AnimatedEnemy):
+                                self.enemies_spawned_in_stage -= 1
                             if self.lives <= 0:
                                 self.game_over = True
                                 self.create_game_over()
@@ -764,6 +874,8 @@ class Game:
                 
                 for enemy in self.enemies:
                     enemy.draw_text(self.screen)
+                    if isinstance(enemy, Boss):
+                        enemy.draw_health_bar(self.screen)
 
                 self.ui.display(stage_number=self.current_stage_index + 1, score=self.score)
 
@@ -789,7 +901,7 @@ class Game:
                 self.game_cleared.update(dt)
 
             elif self.game_state == "level_cleared":
-                self.sounds['gamewin'].play()
+                self.sounds['newlevel'].play()
                 self.staged_cleared.display()
                 self.staged_cleared.update(dt)
 
