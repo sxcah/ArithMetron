@@ -628,6 +628,13 @@ class Game:
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
                 pygame.time.set_timer(SPAWN_EVENT, 1000)
+            elif self.current_stage_index >= len(DIFFICULTY_STAGES) - 1:
+                # All stages completed - transition to game cleared state
+                self.game_state = "game_cleared"
+                self.victory = True
+                self.input_box.active = False
+                self.create_game_completion()
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies
             else:
                 # Stage cleared but more stages remain
                 self.game_state = "level_cleared"
@@ -723,6 +730,7 @@ class Game:
             self.all_sprites,
             self.score
         )
+        self.staged_cleared.display()
 
     def create_game_completion(self):
         self.game_cleared = GameCleared(
@@ -731,6 +739,7 @@ class Game:
             self.all_sprites,
             self.score
         )
+        self.game_cleared.display()
     
     def create_game_over(self):
         self.game_over_screen = GameOver(
@@ -822,11 +831,13 @@ class Game:
                                     self.explosions.add(explosion)
                                     self.all_sprites.add(explosion)
                                     # Boss is defeated, transition to level cleared
-                                    self.game_state = "level_cleared"
-                                    self.create_stage_completion()
-                                    self.sounds['explosion'].play()
-                                    self.sounds['gamewin'].play()
-                                    self.sounds['score'].play()
+                                    if (self.current_stage_index < len(DIFFICULTY_STAGES) - 1):
+                                        self.game_state = "level_cleared"
+                                        self.sounds['explosion'].play()
+                                        self.sounds['gamewin'].play()
+                                        self.sounds['score'].play()
+                                    else:
+                                        self.game_state = "game_cleared"
                                 else:
                                     # Generate a new problem for the boss
                                     enemy.question, enemy.answer = generate_problem(self.score)
@@ -897,12 +908,12 @@ class Game:
 
             elif self.game_state == "game_cleared":
                 self.sounds['gamewin'].play()
-                self.game_cleared.display()
+                self.create_game_completion()
                 self.game_cleared.update(dt)
 
             elif self.game_state == "level_cleared":
                 self.sounds['newlevel'].play()
-                self.staged_cleared.display()
+                self.create_stage_completion()
                 self.staged_cleared.update(dt)
 
             # ---- global hover sound logic ----
