@@ -840,7 +840,6 @@ class Game:
                                     if (self.current_stage_index < len(DIFFICULTY_STAGES) - 1):
                                         self.game_state = "level_cleared"
                                         self.sounds['explosion'].play()
-                                        self.sounds['bosswin'].play()
                                         self.sounds['score'].play()
                                     else:
                                         self.game_state = "game_cleared"
