@@ -8,6 +8,7 @@ from background import AnimatedBackground
 from pop_up import *
 from support import draw_stars
 from Stats import MyStatsPopup
+from powerups import PowerUp
 
 pygame.mixer.init()
 
