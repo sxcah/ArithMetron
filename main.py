@@ -840,7 +840,7 @@ class Game:
                                     self.game_state = "level_cleared"
                                     self.create_stage_completion()
                                     self.sounds['explosion'].play()
-                                    self.sounds['gamewin'].play()
+                                    self.sounds['bosswin'].play()
                                     self.sounds['score'].play()
                                 else:
                                     # Generate a new problem for the boss
