@@ -426,7 +426,7 @@ class Game:
             'gameover' : pygame.mixer.Sound(game_over_sfx),
             'hover'    : pygame.mixer.Sound(hover_sfx),
             'gamewin'  : pygame.mixer.Sound(victory_sfx),
-            'bosswin' : pygame.mixer.Sound(boss_win_sfx)
+            'bosswin'  : pygame.mixer.Sound(boss_win_sfx)
         }
         # Explosion is louder than score
         self.sounds['explosion'].set_volume(self.settings_popup.sfx_volume * 1.8)
