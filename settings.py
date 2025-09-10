@@ -21,6 +21,7 @@ WHITE = (255, 255, 255)
 
 menu_bgm = r'assets/sfx/music/bgm.mp3'
 game_bgm = r'assets/sfx/music/game_bgm.mp3'
+boss_bgm = r'assets/sfx/music/boss_bgm.mp3'
 
 # Sound effects
 new_level_sfx = r'assets/sfx/sound effects/new level/stage_cleared.mp3'
@@ -30,6 +31,7 @@ explosion_sfx = r'assets/sfx/sound effects/explosions/8-bit-explosion-10-340462.
 laser_sfx       = r'assets/sfx/sound effects/laser/laser-104024.mp3'
 hover_sfx = r'assets/sfx/sound effects/hoverbutton1.wav'
 victory_sfx = r'assets/sfx/sound effects/new level/game_win.mp3'
+boss_win_sfx = r'assets\sfx\music\boss_win.mp3'
 
 LIVES = 3
 

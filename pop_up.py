@@ -13,7 +13,8 @@ class SettingsPopup():
             'newlevel' : pygame.mixer.Sound(new_level_sfx),
             'gameover' : pygame.mixer.Sound(game_over_sfx),
             'hover'    : pygame.mixer.Sound(hover_sfx),
-            'gamewin'  : pygame.mixer.Sound(victory_sfx)
+            'gamewin'  : pygame.mixer.Sound(victory_sfx),
+            'bosswin' : pygame.mixer.Sound(boss_win_sfx)
         }
 
     def __init__(self):
@@ -84,6 +85,17 @@ class SettingsPopup():
                 py.mixer.music.set_volume(self.music_volume)
             except py.error as e:
                 print(f"Warning: Could not load game music: {e}")
+
+    def play_boss_music(self):
+        if self.music_enabled and boss_bgm:
+            try:
+                if self.current_music != "boss":
+                    py.mixer.music.load(boss_bgm)
+                    py.mixer.music.play(loops=-1)
+                    self.current_music = "boss"
+                py.mixer.music.set_volume(self.music_volume)
+            except py.error as e:
+                print(f"Warning: Could not load boss music: {e}")
 
     def stop_music(self):
         py.mixer.music.stop()
