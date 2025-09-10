@@ -15,7 +15,7 @@ pygame.mixer.init()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
-def load_frames(filenames, default_color, is_player=True):
+def load_frames(filenames, default_color, width=100, height=100, is_player=True):
     frames = []
     script_dir = "" 
     
@@ -23,7 +23,7 @@ def load_frames(filenames, default_color, is_player=True):
         for filename in filenames:
             path = os.path.join(script_dir, filename)
             img = pygame.image.load(path).convert_alpha()
-            img = pygame.transform.scale(img, (100, 100))
+            img = pygame.transform.scale(img, (width, height))
             frames.append(img)
     except (pygame.error, FileNotFoundError) as e:
         print(f"Warning: Could not load assets: {e}. Using placeholders.")
@@ -373,6 +373,7 @@ class Game:
 
         self.player_frames = load_frames(player_filenames, SHIP_COLOR, is_player=True)
         self.enemy_frames = load_frames(enemy_filenames, ENEMY_COLOR, is_player=False)
+        self.boss_frames = load_frames(boss_filenames, ENEMY_COLOR, 275, 275, is_player=False)
         self.explosion_frames = load_frames(explosion_filenames, (255, 165, 0), is_player=False)
         self.laser_frames = load_frames(laser_filenames, (255, 50, 50), is_player=False)
         

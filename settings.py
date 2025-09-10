@@ -50,6 +50,9 @@ player_filenames = [f"{player_folder_path}1.png",
 enemy_filenames = [f"{enemy_folder_path}1.png",
                    f"{enemy_folder_path}2.png"
                    ]
+boss_filenames = [f"{enemy_folder_path}1.png",
+                   f"{enemy_folder_path}2.png"
+                   ]
 
 explosion_filenames = [f"{explosion_folder_path}1.png",
                        f"{explosion_folder_path}2.png",
