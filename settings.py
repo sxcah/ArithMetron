@@ -21,7 +21,6 @@ WHITE = (255, 255, 255)
 
 menu_bgm = r'assets/sfx/music/bgm.mp3'
 game_bgm = r'assets/sfx/music/game_bgm.mp3'
-boss_bgm = r'assets/sfx/music/boss_bgm.mp3'
 
 # Sound effects
 new_level_sfx = r'assets/sfx/sound effects/new level/stage_cleared.mp3'
@@ -33,7 +32,6 @@ hover_sfx = r'assets/sfx/sound effects/hoverbutton1.wav'
 victory_sfx = r'assets/sfx/sound effects/new level/game_win.mp3'
 
 LIVES = 3
-SHIELD = 0
 
 player_folder_path = 'assets/entity/player/'
 enemy_folder_path = 'assets/entity/enemy/'
@@ -48,10 +46,6 @@ player_filenames = [f"{player_folder_path}1.png",
                     f"{player_folder_path}2.png"
                     ]
 enemy_filenames = [f"{enemy_folder_path}1.png",
-                   f"{enemy_folder_path}2.png"
-                   ]
-
-boss_filenames = [f"{enemy_folder_path}1.png",
                    f"{enemy_folder_path}2.png"
                    ]
 
@@ -120,15 +114,35 @@ FONT_SIZE = {
 
 DIFFICULTY_STAGES = [
     # Stage 1
-    {"spawn_interval": 100,"enemy_speed": 3, "enemies_to_clear": 1},
+    {"spawn_interval": 100,"enemy_speed": 1.5, "enemies_to_clear": 1},
     # Stage 2
-    {"spawn_interval": 100,"enemy_speed": 3, "enemies_to_clear": 1},
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
     # Stage 3   
-    {"spawn_interval": 100,"enemy_speed": 3, "enemies_to_clear": 1},
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
     # Stage 4
-    {"spawn_interval": 100,"enemy_speed": 3, "enemies_to_clear": 1},
+    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
     # Stage 5
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1}
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
+    # Stage 6
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
+    # Stage 7
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+    # Stage 8
+    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+    # Stage 9
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+    # Stage 10
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+    # Stage 11
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 12},
+    # Stage 12
+    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 14},
+    # Stage 13
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 16},
+    # Stage 14
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
+    # Stage 15
+    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
 ]
 
 settings_background = 'assets/ui_ux/settings/tab.png'
@@ -143,7 +157,3 @@ settings_sounds_text = 'assets/ui_ux/settings/text/sound.png'
 
 menu_background = 'assets/background/main_background.png'
 game_title_sprite = 'assets/ui_ux/main_menu/arithmetron.png'
-
-# Shield = 3
-# Time Slow DIFFSTAGE["enemy_speed"] - 2
-# Nuke
