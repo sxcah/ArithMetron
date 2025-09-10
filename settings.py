@@ -21,6 +21,7 @@ WHITE = (255, 255, 255)
 
 menu_bgm = r'assets/sfx/music/bgm.mp3'
 game_bgm = r'assets/sfx/music/game_bgm.mp3'
+boss_bgm = r'assets/sfx/music/boss_bgm.mp3'
 
 # Sound effects
 new_level_sfx = r'assets/sfx/sound effects/new level/stage_cleared.mp3'

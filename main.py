@@ -790,7 +790,10 @@ class Game:
                     self.reset_game()
             
             elif self.game_state == "play" or self.game_state == "boss_battle":
-                self.settings_popup.play_game_music()
+                if self.game_state != "boss_battle":
+                    self.settings_popup.play_game_music()
+                else:
+                    self.settings_popup.play_boss_music()
                 if not self.game_over and not self.paused:
                     self.all_sprites.update(dt)
                     self.input_box.update(dt)
