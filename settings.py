@@ -117,38 +117,74 @@ FONT_SIZE = {
     {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
 ]"""
 
-DIFFICULTY_STAGES = [
-    # Stage 1
-    {"spawn_interval": 100,"enemy_speed": 1.5, "enemies_to_clear": 1},
-    # Stage 2
-    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
-    # Stage 3   
-    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
-    # Stage 4
-    {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 1},
-    # Stage 5
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
-    # Stage 6
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 1},
-    # Stage 7
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
-    # Stage 8
-    {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
-    # Stage 9
-    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
-    # Stage 10
-    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
-    # Stage 11
-    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 12},
-    # Stage 12
-    {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 14},
-    # Stage 13
-    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 16},
-    # Stage 14
-    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
-    # Stage 15
-    {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
-]
+DEBUGGING = True # Change to True if debugging
+
+if DEBUGGING:
+    DIFFICULTY_STAGES = [
+        # Stage 1
+        {"spawn_interval": 1000,"enemy_speed":3, "enemies_to_clear":1},
+        # Stage 23, 
+        {"spawn_interval": 1000,"enemy_speed":3, "enemies_to_clear":1},
+        # Stage 3   3, 
+        {"spawn_interval": 1000,"enemy_speed":3, "enemies_to_clear":1},
+        # Stage 43, 
+        {"spawn_interval": 1000,"enemy_speed":3, "enemies_to_clear":1},
+        # Stage 5
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 63, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 73, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 83, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 93, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 103, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 113, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 123, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 133, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 143, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1},
+        # Stage 153, 1
+        {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1}
+    ]
+else: # Change to NORMAL VALUES
+    DIFFICULTY_STAGES = [
+        # Stage 1
+        {"spawn_interval": 100,"enemy_speed": 2, "enemies_to_clear": 3},
+        # Stage 2
+        {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 4},
+        # Stage 3   
+        {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 5},
+        # Stage 4
+        {"spawn_interval": 100,"enemy_speed": 2.5, "enemies_to_clear": 5},
+        # Stage 5
+        {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 6},
+        # Stage 6
+        {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 6},
+        # Stage 7
+        {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+        # Stage 8
+        {"spawn_interval": 100, "enemy_speed": 3, "enemies_to_clear": 10},
+        # Stage 9
+        {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+        # Stage 10
+        {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 10},
+        # Stage 11
+        {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 12},
+        # Stage 12
+        {"spawn_interval": 2250, "enemy_speed": 3.5, "enemies_to_clear": 14},
+        # Stage 13
+        {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 16},
+        # Stage 14
+        {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
+        # Stage 15
+        {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
+    ]
 
 settings_background = 'assets/ui_ux/settings/tab.png'
 settings_settings_text = 'assets/ui_ux/settings/text/settings.png'

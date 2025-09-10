@@ -191,7 +191,7 @@ class Boss(AnimatedEnemy):
         
         # Set a fixed starting position for the boss
         self.rect.centerx = SCREEN_WIDTH // 2
-        self.rect.y = -100
+        self.rect.y = -100 - 275
         self.target_y = SCREEN_HEIGHT * 0.25 # Boss will stop at 25% of the screen height
 
         self.health = health
@@ -399,6 +399,8 @@ class Game:
         self.game_over = False
         self.paused = False
         self.victory = False
+        self.boss_beaten = False
+        self.boss_win_played = False
         self.score = 0
         self.lives = LIVES
         self.current_stage_index = 0
@@ -604,7 +606,7 @@ class Game:
                                     if self.game_state == "boss_battle" and self.boss in self.enemies:
                                         self.game_state = "level_cleared"
                                         self.create_stage_completion()
-                                        self.sounds['gamewin'].play()
+                                        self.sounds['bosswin'].play()
                                 self.sounds['score'].play()
                     elif event.key == pygame.K_ESCAPE:
                         self.return_to_menu()
@@ -629,6 +631,9 @@ class Game:
                     self.return_to_menu()
             
             elif self.game_state == "game_cleared":
+                if not self.boss_win_played and self.boss_beaten:
+                    self.sounds['bosswin'].play()
+                    self.boss_win_played = True
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.return_to_menu()
             
@@ -637,6 +642,9 @@ class Game:
 
             elif self.game_state == "level_cleared":
                 self.enemies.empty()
+                if not self.boss_win_played and self.boss_beaten:
+                    self.sounds['bosswin'].play()
+                    self.boss_win_played = True
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     if self.ui.lives < LIVES:
                         self.ui.add_life()
@@ -653,7 +661,7 @@ class Game:
             if (self.current_stage_index + 1) % 5 == 0:
                 self.game_state = "boss_battle"
                 # Spawn the boss
-                self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
+                self.boss = Boss(self.boss_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
                 self.enemies.add(self.boss)
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
@@ -673,6 +681,8 @@ class Game:
         self.current_stage_index += 1
         self.enemies_cleared_in_stage = 0
         self.enemies_spawned_in_stage = 0
+        self.sounds['bosswin'].stop()
+        self.boss_beaten = False
         
         if self.current_stage_index < len(DIFFICULTY_STAGES):
             self.current_stage = DIFFICULTY_STAGES[self.current_stage_index]
@@ -710,6 +720,10 @@ class Game:
         self.game_over = False
         self.paused = False
         self.victory = False
+        
+        self.sounds['bosswin'].stop()
+        self.boss_beaten = False
+        self.boss_win_played = False
         
         # Use the same button sizes as __init__
         self.play_button_size = (180, 120)
@@ -785,7 +799,10 @@ class Game:
                     self.reset_game()
             
             elif self.game_state == "play" or self.game_state == "boss_battle":
-                self.settings_popup.play_game_music()
+                if self.game_state != "boss_battle":
+                    self.settings_popup.play_game_music()
+                else:
+                    self.settings_popup.play_boss_music()
                 if not self.game_over and not self.paused:
                     self.all_sprites.update(dt)
                     self.input_box.update(dt)
@@ -838,9 +855,9 @@ class Game:
                                     self.all_sprites.add(explosion)
                                     # Boss is defeated, transition to level cleared
                                     self.game_state = "level_cleared"
+                                    self.boss_beaten = True
                                     self.create_stage_completion()
                                     self.sounds['explosion'].play()
-                                    self.sounds['bosswin'].play()
                                     self.sounds['score'].play()
                                 else:
                                     # Generate a new problem for the boss
