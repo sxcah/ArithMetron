@@ -8,14 +8,13 @@ from background import AnimatedBackground
 from pop_up import *
 from support import draw_stars
 from Stats import MyStatsPopup
-from powerups import PowerUpManager
 
 pygame.mixer.init()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
 
-def load_frames(filenames, default_color, is_player=True):
+def load_frames(filenames, default_color, sizex=100, sizey=100, is_player=True):
     frames = []
     script_dir = "" 
     
@@ -23,13 +22,13 @@ def load_frames(filenames, default_color, is_player=True):
         for filename in filenames:
             path = os.path.join(script_dir, filename)
             img = pygame.image.load(path).convert_alpha()
-            img = pygame.transform.scale(img, (100, 100))
+            img = pygame.transform.scale(img, (sizex, sizey))
             frames.append(img)
     except (pygame.error, FileNotFoundError) as e:
         print(f"Warning: Could not load assets: {e}. Using placeholders.")
         frames = []
         for i in range(4):
-            surf = pygame.Surface((60, 60), pygame.SRCALPHA)
+            surf = pygame.Surface((150, 150), pygame.SRCALPHA)
             if is_player:
                 pygame.draw.circle(surf, SHIP_COLOR, (30, 30), 30)
                 pulsing_color = (100 + i*20, 180 + i*10, 255 - i*20)
@@ -308,7 +307,7 @@ class LevelsSlideWindow:
             text_surface = font.render(f"Level {i}", True, WHITE)
             button = pygame.sprite.Sprite()
             button.image = text_surface
-            button.rect = text_surface.get_rect(center=(self.rect.centerx, button_y))
+            button.rect = button.image.get_rect(center=(self.rect.centerx, button_y))
             self.buttons.append(button)
             button_y += 75
 
@@ -357,8 +356,10 @@ class Game:
         self.menu_background_anim = AnimatedBackground('assets/background/main/', num_frames=1, animation_speed=150)
 
         # DO NOT REMOVE
+
         self.menu_background = pygame.Surface(SCREEN_SIZE)
         self.menu_background.fill(DARK_PURPLE)
+
         for _ in range(200):
             x = random.randint(0, SCREEN_WIDTH)
             y = random.randint(0, SCREEN_HEIGHT)
@@ -366,10 +367,12 @@ class Game:
         
         self.game_background = pygame.Surface(SCREEN_SIZE)
         self.game_background.fill(DARK_BLUE)
+
         # DO NOT REMOVE
 
         self.player_frames = load_frames(player_filenames, SHIP_COLOR, is_player=True)
         self.enemy_frames = load_frames(enemy_filenames, ENEMY_COLOR, is_player=False)
+        self.boss_frames = load_frames(boss_filenames, ENEMY_COLOR, 400, 100, is_player=False)
         self.explosion_frames = load_frames(explosion_filenames, (255, 165, 0), is_player=False)
         self.laser_frames = load_frames(laser_filenames, (255, 50, 50), is_player=False)
         
@@ -392,6 +395,12 @@ class Game:
         self.title_game_rect = self.title_game_scaled.get_rect(center=(SCREEN_WIDTH // 2,
                                                                        SCREEN_HEIGHT * 0.12))
         
+
+
+        """
+        self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
+        self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
+        """
         self.spaceship_launch_speed = -9
         self.menu_animation_speed = 40
         
@@ -435,7 +444,6 @@ class Game:
         self.explosions = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.ui = UI()
-        self.powerup_manager = PowerUpManager()
         self.staged_cleared = None
         self.game_cleared = None
         self.boss = None
@@ -475,7 +483,6 @@ class Game:
         self.lasers.empty()
         self.explosions.empty()
         self.all_sprites.empty()
-        self.powerup_manager.clear_all()
         self.enemies_spawned_in_stage = 0
         
         self.player = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 120)
@@ -578,48 +585,14 @@ class Game:
 
             elif (self.game_state == "play" or self.game_state == "boss_battle") and not self.game_over and not self.paused:
                 submitted_text = self.input_box.handle_event(event)
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        # Use stored powerup
-                        if self.powerup_manager.has_stored_powerups():
-                            powerup_type = self.powerup_manager.stored_powerups[0]  # Check type before using
-                            if self.powerup_manager.use_stored_powerup():
-                                if powerup_type == "bomb":
-                                    # Handle bomb powerup: instantly destroy all enemies
-                                    for enemy in list(self.enemies):
-                                        self.enemies.remove(enemy)
-                                        self.all_sprites.remove(enemy)
-                                        explosion = Explosion(self.explosion_frames, enemy.rect.center)
-                                        self.explosions.add(explosion)
-                                        self.all_sprites.add(explosion)
-                                        self.score += 10
-                                        self.enemies_cleared_in_stage += 1
-                                        self.stats_popup.update({
-                                            "highest_level": self.current_stage_index + 1,
-                                            "annihilated": 1
-                                        })
-                                        self.sounds['explosion'].play()
-                                    if self.game_state == "boss_battle" and self.boss in self.enemies:
-                                        self.game_state = "level_cleared"
-                                        self.create_stage_completion()
-                                        self.sounds['gamewin'].play()
-                                self.sounds['score'].play()
-                    elif event.key == pygame.K_ESCAPE:
-                        self.return_to_menu()
-
                 if event.type == SPAWN_EVENT:
-                    speed_modifier = self.powerup_manager.get_enemy_speed_modifier()
                     if self.game_state == "play" and self.enemies_spawned_in_stage < self.current_stage["enemies_to_clear"]:
-                        speed_modifier = self.powerup_manager.get_enemy_speed_modifier()
-                        modified_speed = self.current_stage["enemy_speed"] * speed_modifier
-                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, modified_speed)
+                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"])
                         self.enemies.add(e)
                         self.all_sprites.add(e)
                         self.enemies_spawned_in_stage += 1
                     elif self.game_state == "boss_battle" and len(self.enemies) < 5: # Limit the number of enemies during the boss fight
-                        speed_modifier = self.powerup_manager.get_enemy_speed_modifier()
-                        modified_speed = (self.current_stage["enemy_speed"] - 2) * speed_modifier
-                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, modified_speed)
+                        e = AnimatedEnemy(self.enemy_frames, self.font_big, self.score, (self.current_stage["enemy_speed"] - 2))
                         self.enemies.add(e)
                         self.all_sprites.add(e)
 
@@ -651,11 +624,18 @@ class Game:
             if (self.current_stage_index + 1) % 5 == 0:
                 self.game_state = "boss_battle"
                 # Spawn the boss
-                self.boss = Boss(self.enemy_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
+                self.boss = Boss(self.boss_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=10)
                 self.enemies.add(self.boss)
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
                 pygame.time.set_timer(SPAWN_EVENT, 1000)
+            elif self.current_stage_index >= len(DIFFICULTY_STAGES) - 1:
+                # All stages completed - transition to game cleared state
+                self.game_state = "game_cleared"
+                self.victory = True
+                self.input_box.active = False
+                self.create_game_completion()
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies
             else:
                 # Stage cleared but more stages remain
                 self.game_state = "level_cleared"
@@ -665,6 +645,26 @@ class Game:
                  })
                 self.create_stage_completion()
                 pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily
+
+    """def check_stage_completion(self):
+        if self.enemies_cleared_in_stage >= self.current_stage["enemies_to_clear"]:
+            # Check if all stages are completed
+            if self.current_stage_index >= len(DIFFICULTY_STAGES) - 1:
+                # All stages completed - transition to game cleared state
+                self.game_state = "game_cleared"
+                self.victory = True
+                self.input_box.active = False
+                self.create_game_completion()
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies
+            else:
+                # Stage cleared but more stages remain
+                self.game_state = "level_cleared"
+                self.stats_popup.update({
+                  "highest_level": self.current_stage_index + 1,
+                   "annihilated": 0
+                 })
+                self.create_stage_completion()
+                pygame.time.set_timer(SPAWN_EVENT, 0)  # Stop spawning enemies temporarily"""
 
     def proceed_to_next_stage(self):
         """Proceed to the next stage after level cleared screen"""
@@ -688,6 +688,10 @@ class Game:
         self.title_game_rect = self.title_game_scaled.get_rect(center=(SCREEN_WIDTH // 2,
                                                                        SCREEN_HEIGHT * 0.12))
 
+        """
+        self.title_surf = self.font_big.render("Arithmetron", True, GOLD)
+        self.title_rect = self.title_surf.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.12))
+        """
         button_path = "assets/ui_ux/play_button"
         play_button_states = load_button_images(button_path, scale=self.play_button_size)
         levels_img   = load_static_button(levels_filename, scale=self.levels_button_size)
@@ -702,6 +706,7 @@ class Game:
             ("Quit", quit_img, self.quit_game)
         ]
         self.create_menu_buttons(button_data)
+
 
     def return_to_menu(self):
         self.game_state = "menu"
@@ -726,6 +731,7 @@ class Game:
             self.all_sprites,
             self.score
         )
+        self.staged_cleared.display()
 
     def create_game_completion(self):
         self.game_cleared = GameCleared(
@@ -734,6 +740,7 @@ class Game:
             self.all_sprites,
             self.score
         )
+        self.game_cleared.display()
     
     def create_game_over(self):
         self.game_over_screen = GameOver(
@@ -783,15 +790,13 @@ class Game:
                     self.reset_game()
             
             elif self.game_state == "play" or self.game_state == "boss_battle":
-                self.settings_popup.play_game_music()
+                if self.game_state != "boss_battle":
+                    self.settings_popup.play_game_music()
+                else:
+                    self.settings_popup.play_boss_music()
                 if not self.game_over and not self.paused:
                     self.all_sprites.update(dt)
                     self.input_box.update(dt)
-                    self.powerup_manager.update(dt)
-                    # Check for player-powerup collisions
-                    powerup_collected = self.powerup_manager.check_player_collision(self.player)
-                    if powerup_collected:
-                        self.sounds['score'].play()
                     
                     if submitted_text is not None:
                         try:
@@ -822,11 +827,6 @@ class Game:
                             # If it's the boss, handle damage
                             if isinstance(enemy, Boss):
                                 if enemy.take_damage():
-                                    # Boss defeated - always give random powerup effect
-                                    if len(self.powerup_manager.stored_powerups) < self.powerup_manager.max_stored:
-                                        powerup_type = random.choice(["slow", "bomb"])
-                                        self.powerup_manager.stored_powerups.append(powerup_type)
-                                    self.sounds['score'].play()
                                     # Remove all enemies (including boss) from both groups
                                     for e in list(self.enemies):
                                         self.enemies.remove(e)
@@ -835,21 +835,20 @@ class Game:
                                     self.explosions.add(explosion)
                                     self.all_sprites.add(explosion)
                                     # Boss is defeated, transition to level cleared
-                                    self.game_state = "level_cleared"
-                                    self.create_stage_completion()
-                                    self.sounds['explosion'].play()
-                                    self.sounds['gamewin'].play()
-                                    self.sounds['score'].play()
+                                    if (self.current_stage_index < len(DIFFICULTY_STAGES) - 1):
+                                        self.game_state = "level_cleared"
+                                        self.sounds['explosion'].play()
+                                        self.sounds['gamewin'].play()
+                                        self.sounds['score'].play()
+                                    else:
+                                        self.game_state = "game_cleared"
                                 else:
                                     # Generate a new problem for the boss
                                     enemy.question, enemy.answer = generate_problem(self.score)
-                                    enemy.text_surf = self.font_big.render(enemy.question, True, TEXT_COLOR)
+                                    enemy.text_surf = enemy.font.render(enemy.question, True, TEXT_COLOR)
                                     enemy.text_rect = enemy.text_surf.get_rect(center=(enemy.rect.centerx, enemy.rect.centery + (10 * 6)))
                                     self.sounds['score'].play()
                             else:
-                                # Regular enemy logic - auto-claim powerup with 20% chance
-                                if self.powerup_manager.auto_claim_powerup():  
-                                    self.sounds['score'].play()
                                 # Regular enemy logic
                                 self.enemies.remove(enemy)
                                 self.all_sprites.remove(enemy)
@@ -869,14 +868,7 @@ class Game:
                         self.check_stage_completion()
                     
                     # Handles Losing Life
-                    speed_modifier = self.powerup_manager.get_enemy_speed_modifier()
                     for e in list(self.enemies):
-                        if hasattr(e, 'base_speed'):
-                            e.speed = e.base_speed * speed_modifier
-                        else:
-                             e.base_speed = e.speed
-                             e.speed = e.base_speed * speed_modifier
-                             
                         if e.rect.bottom >= SCREEN_HEIGHT - 60:
                             self.enemies.remove(e)
                             self.all_sprites.remove(e)
@@ -899,35 +891,21 @@ class Game:
                     enemy.draw_text(self.screen)
                     if isinstance(enemy, Boss):
                         enemy.draw_health_bar(self.screen)
-                self.powerup_manager.draw(self.screen)  # Draw powerup sprites with glow
-                self.powerup_manager.draw_effect_indicator(self.screen, self.font_med, 10, 50)  # Draw stored powerup indicator
 
                 self.ui.display(stage_number=self.current_stage_index + 1, score=self.score)
-
-                if self.paused:
-                    pause_overlay = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-                    pause_overlay.fill((0, 0, 0, 128))
-                    self.screen.blit(pause_overlay, (0, 0))
                     
-                    pause_text = self.font_big.render("PAUSED", True, WHITE)
-                    pause_rect = pause_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-                    self.screen.blit(pause_text, pause_rect)
-                    
-                    resume_text = self.font_med.render("Press P to Resume", True, TEXT_COLOR)
-                    resume_rect = resume_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
-                    self.screen.blit(resume_text, resume_rect)
-                elif self.game_over:
-                    self.game_over_screen.display()
-                    self.game_over_screen.update(dt)
+            elif self.game_over:
+                self.game_over_screen.display()
+                self.game_over_screen.update(dt)
 
             elif self.game_state == "game_cleared":
                 self.sounds['gamewin'].play()
-                self.game_cleared.display()
+                self.create_game_completion()
                 self.game_cleared.update(dt)
 
             elif self.game_state == "level_cleared":
                 self.sounds['newlevel'].play()
-                self.staged_cleared.display()
+                self.create_stage_completion()
                 self.staged_cleared.update(dt)
 
             # ---- global hover sound logic ----
@@ -943,7 +921,6 @@ class Game:
 
             pygame.display.flip()
             self.clock.tick(FPS)
-
 if __name__ == "__main__":
     game = Game()
     game.run()
