@@ -137,21 +137,19 @@ class PowerUpManager:
         
         return frames
     
-    def spawn_powerup(self, x, y, powerup_type="bomb"):
+    def spawn_powerup(self, x, y, powerup_type="slow"):
         # Randomly select powerup type if not specified
         if powerup_type == "random":
-            """powerup_type = random.choice(["slow", "bomb", "shield"])"""
-            powerup_type = random.choice(["bomb", "bomb", "bomb"])
+            powerup_type = random.choice(["slow", "bomb", "shield"])
         frames = self.create_powerup_frames(powerup_type)
         powerup = PowerUp(frames, x, y, powerup_type)
         self.powerups.add(powerup)
         return powerup
     
-    def auto_claim_powerup(self, chance=1):
+    def auto_claim_powerup(self, chance=0.2):
         if random.random() < chance:
             if len(self.stored_powerups) < self.max_stored:
-                """powerup_type = random.choice(["slow", "bomb", "shield"])"""
-                powerup_type = random.choice(["bomb", "bomb", "bomb"])
+                powerup_type = random.choice(["slow", "bomb", "shield"])
                 self.stored_powerups.append(powerup_type)
                 return powerup_type
         return None
