@@ -38,6 +38,7 @@ LIVES = 3
 player_folder_path = 'assets/entity/player/'
 enemy_folder_path = 'assets/entity/enemy/'
 boss_folder_path = 'assets/entity/boss/'
+
 explosion_folder_path = 'assets/vfx/explosion/'
 laser_travelling_folder_path = 'assets/vfx/laser/travelling/'
 laser_firing_folder_path = 'assets/vfx/laser/firing/'
@@ -51,8 +52,12 @@ player_filenames = [f"{player_folder_path}1.png",
 enemy_filenames = [f"{enemy_folder_path}1.png",
                    f"{enemy_folder_path}2.png"
                    ]
-boss_filenames = [f"{enemy_folder_path}1.png",
-                   f"{enemy_folder_path}2.png"
+boss_filenames = [f"{boss_folder_path}1.png",
+                   f"{boss_folder_path}2.png",
+                   f"{boss_folder_path}3.png",
+                   f"{boss_folder_path}4.png",
+                   f"{boss_folder_path}5.png",
+                   f"{boss_folder_path}6.png"
                    ]
 
 explosion_filenames = [f"{explosion_folder_path}1.png",
@@ -121,6 +126,7 @@ FONT_SIZE = {
 DEBUGGING = True # Change to True if debugging
 
 if DEBUGGING:
+    BOSS_HEALTH = 1
     DIFFICULTY_STAGES = [
         # Stage 1
         {"spawn_interval": 1000,"enemy_speed":3, "enemies_to_clear":1},
@@ -154,6 +160,7 @@ if DEBUGGING:
         {"spawn_interval": 1000, "enemy_speed":3, "enemies_to_clear":1}
     ]
 else: # Change to NORMAL VALUES
+    BOSS_HEALTH = 10
     DIFFICULTY_STAGES = [
         # Stage 1
         {"spawn_interval": 100,"enemy_speed": 2, "enemies_to_clear": 3},
@@ -184,8 +191,10 @@ else: # Change to NORMAL VALUES
         # Stage 14
         {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 18},
         # Stage 15
-        {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20},""
+        {"spawn_interval": 2500, "enemy_speed": 4, "enemies_to_clear": 20}
     ]
+
+BOSS_HEALTH = 5
 
 settings_background = 'assets/ui_ux/settings/tab.png'
 settings_settings_text = 'assets/ui_ux/settings/text/settings.png'

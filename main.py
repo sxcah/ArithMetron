@@ -160,7 +160,7 @@ class AnimatedEnemy(AnimatedSprite):
 
     def update(self, dt):
         super().update(dt)
-        self.text_rect.center = (self.rect.centerx, self.rect.centery + (10 * 6))
+        self.text_rect.center = (self.rect.centerx, self.rect.centery)
 
     def draw_text(self, screen):
         box_padding = 5
@@ -180,8 +180,11 @@ class AnimatedEnemy(AnimatedSprite):
         pygame.draw.line(s, border_color, (s.get_width() - border_length, s.get_height() - 1), (s.get_width() - 1, s.get_height() - 1), border_thickness)
         pygame.draw.line(s, border_color, (s.get_width() - 1, s.get_height() - border_length), (s.get_width() - 1, s.get_height() - 1), border_thickness)
 
-        screen.blit(s, box_rect.topleft)
-        screen.blit(self.text_surf, self.text_rect)
+        # Blit s to the screen, aligned with the new text position
+        new_y = self.text_rect.y + (10 * 6)
+        screen.blit(s, (box_rect.x, new_y - box_padding))
+        
+        screen.blit(self.text_surf, (self.text_rect.x, new_y))
 
 class Boss(AnimatedEnemy):
     def __init__(self, frames, font, score, speed, health):
@@ -190,10 +193,16 @@ class Boss(AnimatedEnemy):
         # Pass the correct parameters to the parent class, using the new boss_speed
         super().__init__(frames, font, score * 2, boss_speed)
         
+        # Update rect to match the scaled boss image size
+        self.rect = self.image.get_rect(center=(SCREEN_WIDTH // 2, -self.image.get_height() // 2))
+
+        # Adjust the height of the boss's rect to be smaller
+        new_height = self.rect.height * 0.45  # Example: 45% of the original height
+        self.rect = pygame.Rect(self.rect.x, self.rect.y + self.rect.height * 0.55, self.rect.width, new_height)
+
         # Set a fixed starting position for the boss
-        self.rect.centerx = SCREEN_WIDTH // 2
-        self.rect.y = -100 - 275
-        self.target_y = SCREEN_HEIGHT * 0.25 # Boss will stop at 25% of the screen height
+        self.rect.y = -self.rect.height
+        self.target_y = 0
 
         self.health = health
         self.max_health = health
@@ -209,7 +218,7 @@ class Boss(AnimatedEnemy):
             self.frame_index = (self.frame_index + 1) % len(self.frames)
             self.image = self.frames[self.frame_index]
             
-        self.text_rect.center = (self.rect.centerx, self.rect.centery + (10 * 6))
+        self.text_rect.center = (self.rect.centerx, self.rect.centery)
 
     def take_damage(self):
         self.health -= 1
@@ -220,11 +229,45 @@ class Boss(AnimatedEnemy):
         bar_height = 10
         fill_width = (self.health / self.max_health) * bar_width
         
-        outline_rect = pygame.Rect(self.rect.x, self.rect.y - 15, bar_width, bar_height)
-        fill_rect = pygame.Rect(self.rect.x, self.rect.y - 15, fill_width, bar_height)
+        # Calculate the new, smaller width
+        new_bar_width = bar_width * 0.25
+        new_fill_width = fill_width * 0.25
+
+        # Calculate the centered x-coordinate
+        bar_x = self.rect.centerx - (new_bar_width // 2)
+
+        # Draw the health bar centered horizontally and below the boss's hitbox
+        outline_rect = pygame.Rect(bar_x, self.rect.bottom + 15, new_bar_width, bar_height)
+        fill_rect = pygame.Rect(bar_x, self.rect.bottom + 15, new_fill_width, bar_height)
 
         pygame.draw.rect(screen, (255, 0, 0), fill_rect)
         pygame.draw.rect(screen, (255, 255, 255), outline_rect, 2)
+
+        # pygame.draw.rect(screen, (0, 255, 0), self.rect, 2) # Green rectangle, 2 pixels thick
+
+    def draw_boss_text(self, screen):
+        box_padding = 5
+        box_rect = self.text_rect.inflate(box_padding * 2, box_padding * 2)
+        s = pygame.Surface(box_rect.size, pygame.SRCALPHA)
+        s.fill((255, 215, 0, 75))
+        
+        border_color = (255, 215, 0)
+        border_thickness = 2
+        border_length = 20 # Adjust this to control the length of the corner lines
+
+        # Draw top-left corner
+        pygame.draw.line(s, border_color, (0, 0), (border_length, 0), border_thickness)
+        pygame.draw.line(s, border_color, (0, 0), (0, border_length), border_thickness)
+
+        # Draw bottom-right corner
+        pygame.draw.line(s, border_color, (s.get_width() - border_length, s.get_height() - 1), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+        pygame.draw.line(s, border_color, (s.get_width() - 1, s.get_height() - border_length), (s.get_width() - 1, s.get_height() - 1), border_thickness)
+
+        # Blit s to the screen, aligned with the new text position
+        new_y = self.text_rect.y - (10 * 6)
+        screen.blit(s, (box_rect.x, new_y - box_padding))
+        
+        screen.blit(self.text_surf, (self.text_rect.x, new_y))
 
 class Laser(AnimatedSprite):
     def __init__(self, frames, start_pos, target_pos):
@@ -345,6 +388,7 @@ class Game:
         self.shield_effect = None
         pygame.init()
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
+        self.display_surface = pygame.display.get_surface()
         pygame.display.set_caption("Arithmetron")
         self.clock = pygame.time.Clock()
         self.game_state = "menu"
@@ -372,7 +416,9 @@ class Game:
 
         self.player_frames = load_frames(player_filenames, SHIP_COLOR, is_player=True)
         self.enemy_frames = load_frames(enemy_filenames, ENEMY_COLOR, is_player=False)
-        self.boss_frames = load_frames(boss_filenames, ENEMY_COLOR, 275, 275, is_player=False)
+        self.boss_frames = load_frames(boss_filenames, ENEMY_COLOR,
+                                        self.display_surface.get_width(),
+                                        self.display_surface.get_height() - (10 * 5), is_player=False)
         self.explosion_frames = load_frames(explosion_filenames, (255, 165, 0), is_player=False)
         self.laser_frames = load_frames(laser_filenames, (255, 50, 50), is_player=False)
         
@@ -486,8 +532,7 @@ class Game:
         self.all_sprites.empty()
         self.powerup_manager.clear_all()
         self.enemies_spawned_in_stage = 0
-        
-        self.player = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 120)
+
         self.all_sprites.add(self.player)
         
         self.current_stage = DIFFICULTY_STAGES[self.current_stage_index]
@@ -596,24 +641,19 @@ class Game:
                                 if powerup_type == "bomb":
                                     # Handle bomb powerup: instantly destroy all enemies
                                     for enemy in list(self.enemies):
-                                        self.enemies.remove(enemy)
-                                        self.all_sprites.remove(enemy)
-                                        explosion = Explosion(self.explosion_frames, enemy.rect.center)
-                                        self.explosions.add(explosion)
-                                        self.all_sprites.add(explosion)
-                                        self.score += 10
-                                        self.enemies_cleared_in_stage += 1
-                                        self.stats_popup.update({
-                                            "highest_level": self.current_stage_index + 1,
-                                            "annihilated": 1
-                                        })
-                                        self.sounds['explosion'].play()
-                                    if self.game_state == "boss_battle" and self.boss in self.enemies:
-                                        self.game_state = "level_cleared"
-                                        self.create_stage_completion()
-                                        self.sounds['bosswin'].play()
-                                    elif powerup_type == "shield":
-                                        pass
+                                        if not isinstance(enemy, Boss):
+                                            self.enemies.remove(enemy)
+                                            self.all_sprites.remove(enemy)
+                                            explosion = Explosion(self.explosion_frames, enemy.rect.center)
+                                            self.explosions.add(explosion)
+                                            self.all_sprites.add(explosion)
+                                            self.score += 10
+                                            self.enemies_cleared_in_stage += 1
+                                            self.stats_popup.update({
+                                                "highest_level": self.current_stage_index + 1,
+                                                "annihilated": 1
+                                            })
+                                            self.sounds['explosion'].play()
                                     
                                     self.sounds['score'].play()
                                     
@@ -670,7 +710,7 @@ class Game:
             if (self.current_stage_index + 1) % 5 == 0:
                 self.game_state = "boss_battle"
                 # Spawn the boss
-                self.boss = Boss(self.boss_frames, self.font_big, self.score, self.current_stage["enemy_speed"], health=1)
+                self.boss = Boss(self.boss_frames, self.font_big, self.score, self.current_stage["enemy_speed"], BOSS_HEALTH)
                 self.enemies.add(self.boss)
                 self.all_sprites.add(self.boss)
                 # Restart the spawn timer for the boss fight
@@ -730,6 +770,23 @@ class Game:
         self.paused = False
         self.victory = False
         
+        self.player = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 120)
+        self.all_sprites.add(self.player)
+        self.shield_effect = ShieldEffect(self.player)
+
+        self.score = 0
+        self.lives = LIVES
+        self.ui.reset_lives()
+        self.current_stage_index = 0
+        self.stage_completed = 0
+        self.enemies_cleared_in_stage = 0
+        self.enemies.empty()
+        self.lasers.empty()
+        self.explosions.empty()
+        self.all_sprites.empty()
+        self.powerup_manager.clear_all()
+        self.enemies_spawned_in_stage = 0
+
         self.sounds['bosswin'].stop()
         self.boss_beaten = False
         self.boss_win_played = False
@@ -844,13 +901,13 @@ class Game:
 
                     # Handle Hits for hitting enemy
                     hits = pygame.sprite.groupcollide(self.lasers, self.enemies, True, False) # Don't kill enemy automatically
-                    
+
                     for laser, enemies_hit in hits.items():
                         for enemy in enemies_hit:
                             # If it's the boss, handle damage
                             if isinstance(enemy, Boss):
                                 if enemy.take_damage():
-                                    # Boss defeated - always give random powerup effect
+                                    # Boss defeated, now remove and handle victory
                                     if len(self.powerup_manager.stored_powerups) < self.powerup_manager.max_stored:
                                         powerup_type = random.choice(["slow", "bomb", "shield"])
                                         self.powerup_manager.stored_powerups.append(powerup_type)
@@ -872,7 +929,7 @@ class Game:
                                     # Generate a new problem for the boss
                                     enemy.question, enemy.answer = generate_problem(self.score)
                                     enemy.text_surf = self.font_big.render(enemy.question, True, TEXT_COLOR)
-                                    enemy.text_rect = enemy.text_surf.get_rect(center=(enemy.rect.centerx, enemy.rect.centery + (10 * 6)))
+                                    enemy.text_rect = enemy.text_surf.get_rect(center=(enemy.rect.centerx, enemy.rect.centery - (10 * 10)))
                                     self.sounds['score'].play()
                             else:
                                 # Regular enemy logic - auto-claim powerup with 20% chance
@@ -884,7 +941,10 @@ class Game:
                                 explosion = Explosion(self.explosion_frames, enemy.rect.center)
                                 self.explosions.add(explosion)
                                 self.all_sprites.add(explosion)
-                                self.score += 10
+                                if self.game_state != "boss_battle":
+                                    self.score += 10
+                                else:
+                                    self.score += 0
                                 self.enemies_cleared_in_stage += 1
                                 self.stats_popup.update({
                                     "highest_level": self.current_stage_index + 1,
@@ -940,9 +1000,11 @@ class Game:
                 self.input_box.draw(self.screen)
                 
                 for enemy in self.enemies:
-                    enemy.draw_text(self.screen)
+                    if not isinstance(enemy, Boss):
+                        enemy.draw_text(self.screen)
                     if isinstance(enemy, Boss):
                         enemy.draw_health_bar(self.screen)
+                        enemy.draw_boss_text(self.screen)
                 self.powerup_manager.draw(self.screen)  # Draw powerup sprites with glow
                 self.powerup_manager.draw_effect_indicator(self.screen, self.font_med, 10, 50)  # Draw stored powerup indicator
 
