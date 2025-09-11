@@ -37,6 +37,7 @@ LIVES = 3
 
 player_folder_path = 'assets/entity/player/'
 enemy_folder_path = 'assets/entity/enemy/'
+boss_folder_path = 'assets/entity/boss/'
 explosion_folder_path = 'assets/vfx/explosion/'
 laser_travelling_folder_path = 'assets/vfx/laser/travelling/'
 laser_firing_folder_path = 'assets/vfx/laser/firing/'
