@@ -55,6 +55,8 @@ class PowerUp(AnimatedSprite):
                 color = (0, 150, 255, alpha)  # Blue glow for slow powerup
             elif self.powerup_type == "bomb":
                 color = (255, 50, 50, alpha)  # Red glow for bomb powerup
+            elif self.powerup_type == "shield":
+                color = (50, 255, 50, alpha)  # Green glow for shield powerup
             else:
                 color = (255, 255, 0, alpha)  # Yellow glow for other types
             
@@ -73,6 +75,7 @@ class PowerUpManager:
         self.max_stored = 1  # Changed to 1 to prevent collecting new power-ups if one is stored
         self.slow_effect_duration = 5000  # 5 seconds
         self.slow_factor = 0.3  # Enemies move at 30% speed when slowed
+        self.shield_effect_duration = 10000  # 10 seconds
         
     def create_powerup_frames(self, powerup_type="slow"):
         frames = []
@@ -80,6 +83,8 @@ class PowerUpManager:
             image_path = r"assets\powerups\POWERUP-Clock.png"
         elif powerup_type == "bomb":
             image_path = r"assets\powerups\POWERUP-Bomb.png"
+        elif powerup_type == "shield":
+            image_path = r"assets\powerups\POWERUP-Shield.png"
         else:
             image_path = r"assets\powerups\POWERUP-Clock.png"  # Fallback to clock
         
@@ -112,6 +117,8 @@ class PowerUpManager:
                     color = (base_color % 255, (base_color + 85) % 255, (base_color + 170) % 255)
                 elif powerup_type == "bomb":
                     color = (255, 50, 50)  # Red for bomb
+                elif powerup_type == "shield":
+                    color = (50, 255, 50)  # Green for shield
                 else:
                     color = (base_color % 255, (base_color + 85) % 255, (base_color + 170) % 255)
                 pygame.draw.polygon(surf, color, points)
@@ -133,7 +140,7 @@ class PowerUpManager:
     def spawn_powerup(self, x, y, powerup_type="slow"):
         # Randomly select powerup type if not specified
         if powerup_type == "random":
-            powerup_type = random.choice(["slow", "bomb"])
+            powerup_type = random.choice(["slow", "bomb", "shield"])
         frames = self.create_powerup_frames(powerup_type)
         powerup = PowerUp(frames, x, y, powerup_type)
         self.powerups.add(powerup)
@@ -142,7 +149,7 @@ class PowerUpManager:
     def auto_claim_powerup(self, chance=0.2):
         if random.random() < chance:
             if len(self.stored_powerups) < self.max_stored:
-                powerup_type = random.choice(["slow", "bomb"])
+                powerup_type = random.choice(["slow", "bomb", "shield"])
                 self.stored_powerups.append(powerup_type)
                 return powerup_type
         return None
@@ -154,7 +161,10 @@ class PowerUpManager:
                 self.activate_slow_effect()
                 return True
             elif powerup_type == "bomb":
-                return True  
+                return True
+            elif powerup_type == "shield":
+                self.activate_shield_effect()
+                return True
         return False
     
     def has_stored_powerups(self):
@@ -181,6 +191,12 @@ class PowerUpManager:
             "duration": self.slow_effect_duration
         }
     
+    def activate_shield_effect(self):
+        self.active_effects["shield"] = {
+            "start_time": pygame.time.get_ticks(),
+            "duration": self.shield_effect_duration
+        }
+    
     def is_slow_active(self):
         if "slow" not in self.active_effects:
             return False
@@ -190,6 +206,19 @@ class PowerUpManager:
         
         if current_time - effect["start_time"] > effect["duration"]:
             del self.active_effects["slow"]
+            return False
+        
+        return True
+    
+    def is_shield_active(self):
+        if "shield" not in self.active_effects:
+            return False
+        
+        current_time = pygame.time.get_ticks()
+        effect = self.active_effects["shield"]
+        
+        if current_time - effect["start_time"] > effect["duration"]:
+            del self.active_effects["shield"]
             return False
         
         return True
@@ -205,6 +234,17 @@ class PowerUpManager:
         
         current_time = pygame.time.get_ticks()
         effect = self.active_effects["slow"]
+        elapsed = current_time - effect["start_time"]
+        remaining = max(0, effect["duration"] - elapsed)
+        
+        return remaining
+    
+    def get_remaining_shield_time(self):
+        if not self.is_shield_active():
+            return 0
+        
+        current_time = pygame.time.get_ticks()
+        effect = self.active_effects["shield"]
         elapsed = current_time - effect["start_time"]
         remaining = max(0, effect["duration"] - elapsed)
         
@@ -238,6 +278,23 @@ class PowerUpManager:
             screen.blit(text, (x + 5, current_y + 2))
             current_y += 35
         
+        # Show active shield effect
+        if self.is_shield_active():
+            remaining_time = self.get_remaining_shield_time() / 1000.0  
+            text = font.render(f"SHIELD ACTIVE: {remaining_time:.1f}s", True, (50, 255, 50))
+            
+            # Draw background
+            bg_rect = text.get_rect()
+            bg_rect.x = x
+            bg_rect.y = current_y
+            bg_rect.inflate_ip(10, 5)
+            
+            pygame.draw.rect(screen, (0, 0, 0, 128), bg_rect)
+            pygame.draw.rect(screen, (50, 255, 50), bg_rect, 2)
+            
+            screen.blit(text, (x + 5, current_y + 2))
+            current_y += 35
+        
         if self.stored_powerups:
             # Load appropriate icon based on powerup type
             powerup_type = self.stored_powerups[0]
@@ -247,6 +304,8 @@ class PowerUpManager:
                     icon_path = r"assets\powerups\POWERUP-Clock.png"
                 elif powerup_type == "bomb":
                     icon_path = r"assets\powerups\POWERUP-Bomb.png"
+                elif powerup_type == "shield":
+                    icon_path = r"assets\powerups\POWERUP-Shield.png"
                 icon = pygame.image.load(icon_path).convert_alpha()
                 icon = pygame.transform.scale(icon, (50, 50)) 
             except:
@@ -257,6 +316,8 @@ class PowerUpManager:
                     pygame.draw.polygon(icon, (0, 150, 255), points)
                 elif powerup_type == "bomb":
                     pygame.draw.polygon(icon, (255, 50, 50), points)
+                elif powerup_type == "shield":
+                    pygame.draw.polygon(icon, (50, 255, 50), points)
                 pygame.draw.polygon(icon, (255, 255, 255), points, 3)
             
             box_size = 60

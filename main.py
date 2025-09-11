@@ -9,6 +9,7 @@ from pop_up import *
 from support import draw_stars
 from Stats import MyStatsPopup
 from powerups import PowerUpManager
+from shield_effect import ShieldEffect
 
 pygame.mixer.init()
 
@@ -341,6 +342,7 @@ from input_box import InputBox
 
 class Game:
     def __init__(self):
+        self.shield_effect = None
         pygame.init()
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         pygame.display.set_caption("Arithmetron")
@@ -465,6 +467,9 @@ class Game:
                 button.action = action
     
     def reset_game(self):
+        self.player = AnimatedSprite(self.player_frames, SCREEN_WIDTH // 2, SCREEN_HEIGHT - 120)
+        self.all_sprites.add(self.player)
+        self.shield_effect = ShieldEffect(self.player)
         self.game_state = "play"
         self.game_over = False
         self.paused = False
@@ -607,7 +612,11 @@ class Game:
                                         self.game_state = "level_cleared"
                                         self.create_stage_completion()
                                         self.sounds['bosswin'].play()
-                                self.sounds['score'].play()
+                                    elif powerup_type == "shield":
+                                        pass
+                                    
+                                    self.sounds['score'].play()
+                                    
                     elif event.key == pygame.K_ESCAPE:
                         self.return_to_menu()
 
@@ -843,7 +852,7 @@ class Game:
                                 if enemy.take_damage():
                                     # Boss defeated - always give random powerup effect
                                     if len(self.powerup_manager.stored_powerups) < self.powerup_manager.max_stored:
-                                        powerup_type = random.choice(["slow", "bomb"])
+                                        powerup_type = random.choice(["slow", "bomb", "shield"])
                                         self.powerup_manager.stored_powerups.append(powerup_type)
                                     self.sounds['score'].play()
                                     # Remove all enemies (including boss) from both groups
@@ -899,19 +908,35 @@ class Game:
                         if e.rect.bottom >= SCREEN_HEIGHT - 60:
                             self.enemies.remove(e)
                             self.all_sprites.remove(e)
-                            self.ui.lose_life()
-                            self.lives = self.ui.lives
+                            # Check if shield is active before losing life
+                            if not self.powerup_manager.is_shield_active():
+                                self.ui.lose_life()
+                                self.lives = self.ui.lives
+                            else:
+                                # Shield absorbed the hit 
+                                if self.shield_effect:
+                                     self.shield_effect.create_impact_effect()
+                                self.sounds['score'].play() 
+                                                        
                             self.input_box.text = ""
                             if isinstance(e, AnimatedEnemy):
                                 self.enemies_spawned_in_stage -= 1
-                            if self.lives <= 0:
+                            if self.lives <= 0 and not self.powerup_manager.is_shield_active():
                                 self.game_over = True
                                 self.create_game_over()
                                 self.input_box.active = False
                                 self.sounds['gameover'].play()
+                    if self.shield_effect:
+                        self.shield_effect.update(dt)
+                        if self.powerup_manager.is_shield_active():
+                            self.shield_effect.activate()
+                        else:
+                            self.shield_effect.deactivate()
                 
                 pygame.draw.line(self.screen, (60, 80, 120), (0, SCREEN_HEIGHT - 60), (SCREEN_WIDTH, SCREEN_HEIGHT - 60), 2)
                 self.all_sprites.draw(self.screen)
+                if self.shield_effect:
+                    self.shield_effect.draw(self.screen)
                 self.input_box.draw(self.screen)
                 
                 for enemy in self.enemies:
